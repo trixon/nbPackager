@@ -15,17 +15,35 @@
  */
 package se.trixon.nbpackager;
 
+import java.awt.event.WindowEvent;
+import java.util.prefs.Preferences;
+import javax.swing.ImageIcon;
+import se.trixon.almond.util.AlmondOptions;
+import se.trixon.almond.util.AlmondUI;
+import se.trixon.almond.util.Dict;
+import se.trixon.almond.util.PomInfo;
+import se.trixon.almond.util.SystemHelper;
+import se.trixon.almond.util.swing.AboutModel;
+import se.trixon.almond.util.swing.SwingHelper;
+import se.trixon.almond.util.swing.dialogs.about.AboutPanel;
+import se.trixon.nbpackager_core.Options;
+
 /**
  *
  * @author Patrik Karlström
  */
 public class MainFrame extends javax.swing.JFrame {
 
+    private static final AlmondUI sAlmondUI = AlmondUI.getInstance();
+    private static final AlmondOptions sAlmondOptions = AlmondOptions.getInstance();
+    private final Options mOptions = Options.getInstance();
+
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
         initComponents();
+        init();
     }
 
     /**
@@ -35,77 +53,158 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        mainPanel1 = new se.trixon.nbpackager_core.MainPanel();
+        mainPanel = new se.trixon.nbpackager_core.MainPanel();
+        logPanel = new se.trixon.almond.util.swing.LogPanel();
+        menuBar = new javax.swing.JMenuBar();
+        fileMenu = new javax.swing.JMenu();
+        quitMenuItem = new javax.swing.JMenuItem();
+        toolsMenu = new javax.swing.JMenu();
+        optionsMenuItem = new javax.swing.JMenuItem();
+        helpMenu = new javax.swing.JMenu();
+        helpMenuItem = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        aboutMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("nbPackager");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
+        getContentPane().add(mainPanel, java.awt.BorderLayout.CENTER);
 
-        javax.swing.GroupLayout mainPanel1Layout = new javax.swing.GroupLayout(mainPanel1);
-        mainPanel1.setLayout(mainPanel1Layout);
-        mainPanel1Layout.setHorizontalGroup(
-            mainPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        mainPanel1Layout.setVerticalGroup(
-            mainPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
+        logPanel.setPreferredSize(new java.awt.Dimension(198, 300));
+        getContentPane().add(logPanel, java.awt.BorderLayout.PAGE_END);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(mainPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(294, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(mainPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(194, Short.MAX_VALUE))
-        );
+        fileMenu.setText(Dict.FILE_MENU.toString());
+
+        quitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_MASK));
+        quitMenuItem.setText(Dict.QUIT.toString());
+        quitMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                quitMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(quitMenuItem);
+
+        menuBar.add(fileMenu);
+
+        toolsMenu.setText(Dict.TOOLS.toString());
+
+        optionsMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_COMMA, java.awt.event.InputEvent.CTRL_MASK));
+        optionsMenuItem.setText(Dict.OPTIONS.toString());
+        optionsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                optionsMenuItemActionPerformed(evt);
+            }
+        });
+        toolsMenu.add(optionsMenuItem);
+
+        menuBar.add(toolsMenu);
+
+        helpMenu.setText(Dict.HELP.toString());
+
+        helpMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F1, 0));
+        helpMenuItem.setText(Dict.HELP.toString());
+        helpMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                helpMenuItemActionPerformed(evt);
+            }
+        });
+        helpMenu.add(helpMenuItem);
+        helpMenu.add(jSeparator1);
+
+        aboutMenuItem.setText(Dict.ABOUT.toString());
+        helpMenu.add(aboutMenuItem);
+
+        menuBar.add(helpMenu);
+
+        setJMenuBar(menuBar);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void quitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quitMenuItemActionPerformed
+        dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+    }//GEN-LAST:event_quitMenuItemActionPerformed
+
+    private void optionsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optionsMenuItemActionPerformed
+//        mOptionsPanel.load();
+//        Object[] options = new Object[]{AlmondOptionsPanel.getGlobalOptionsButton(mOptionsPanel), new JSeparator(), Dict.CANCEL, Dict.OK};
+//        int retval = JOptionPane.showOptionDialog(this,
+//                mOptionsPanel,
+//                Dict.OPTIONS.toString(),
+//                JOptionPane.DEFAULT_OPTION,
+//                JOptionPane.PLAIN_MESSAGE,
+//                null,
+//                options,
+//                Dict.OK);
+//
+//        if (retval == Arrays.asList(options).indexOf(Dict.OK)) {
+//            mOptionsPanel.save();
+//        }
+    }//GEN-LAST:event_optionsMenuItemActionPerformed
+
+    private void helpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_helpMenuItemActionPerformed
+        mainPanel.displayHelp();
+    }//GEN-LAST:event_helpMenuItemActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        SwingHelper.frameStateSave(this);
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+        SystemHelper.setMacApplicationName("nbPackager");
+        sAlmondUI.installFlatLaf();
+        sAlmondOptions.setDefaultLookAndFeel("FlatLaf Dark");
+        sAlmondUI.initLookAndFeel();
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainFrame().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new MainFrame().setVisible(true);
         });
     }
 
+    private void init() {
+        String fileName = String.format("/%s/about_logo.png", getClass().getPackage().getName().replace(".", "/"));
+        ImageIcon imageIcon = new ImageIcon(getClass().getResource(fileName));
+        setIconImage(imageIcon.getImage());
+        sAlmondUI.addWindowWatcher(this);
+        sAlmondUI.initoptions();
+        mOptions.setPreferences(Preferences.userNodeForPackage(MainFrame.class));
+//        SwingHelper.makeWindowResizable(mOptionsPanel);
+
+        PomInfo pomInfo = new PomInfo(MainFrame.class, "se.trixon.nbpackager", "nbpackager");
+        AboutModel aboutModel = new AboutModel(SystemHelper.getBundle(MainFrame.class, "about"), SystemHelper.getResourceAsImageIcon(MainFrame.class, "about_logo.png"));
+
+        aboutModel.setAppVersion(pomInfo.getVersion());
+        AboutPanel aboutPanel = new AboutPanel(aboutModel);
+        aboutMenuItem.setAction(AboutPanel.getAction(MainFrame.this, aboutPanel));
+        mainPanel.getLog().setOut(s -> {
+            logPanel.println(s);
+        });
+        mainPanel.getLog().setErr(s -> {
+            logPanel.println(s);
+        });
+
+        mainPanel.init();
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private se.trixon.nbpackager_core.MainPanel mainPanel1;
+    private javax.swing.JMenuItem aboutMenuItem;
+    private javax.swing.JMenu fileMenu;
+    private javax.swing.JMenu helpMenu;
+    private javax.swing.JMenuItem helpMenuItem;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
+    private se.trixon.almond.util.swing.LogPanel logPanel;
+    private se.trixon.nbpackager_core.MainPanel mainPanel;
+    private javax.swing.JMenuBar menuBar;
+    private javax.swing.JMenuItem optionsMenuItem;
+    private javax.swing.JMenuItem quitMenuItem;
+    private javax.swing.JMenu toolsMenu;
     // End of variables declaration//GEN-END:variables
 }

@@ -15,17 +15,74 @@
  */
 package se.trixon.nbpackager_core;
 
+import java.awt.Color;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import se.trixon.almond.util.Dict;
+import se.trixon.almond.util.GraphicsHelper;
+import se.trixon.almond.util.Log;
+import se.trixon.almond.util.SystemHelper;
+import se.trixon.almond.util.icons.material.swing.MaterialIcon;
+import static se.trixon.nbpackager_core.Options.*;
+
 /**
  *
  * @author Patrik Karlström
  */
 public class MainPanel extends javax.swing.JPanel {
 
+    private final Log mLog = new Log();
+    private final Options mOptions = Options.getInstance();
+    private static final int ICON_SIZE = 24;
+
     /**
      * Creates new form MainPanel
      */
     public MainPanel() {
+        MaterialIcon.setDefaultColor(GraphicsHelper.getBrightness(new JButton().getBackground()) < 128 ? Color.WHITE : Color.BLACK);
         initComponents();
+        mLog.setUseTimestamps(false);
+        helpButton.setVisible(false);
+    }
+
+    public void displayHelp() {
+        SystemHelper.desktopBrowse("https://trixon.se/projects/nbpackager");
+    }
+
+    public static int getIconSize() {
+        return ICON_SIZE;
+    }
+
+    public Log getLog() {
+        return mLog;
+    }
+
+    private String getProfileName() {
+        return profileComboBox.getSelectedItem().toString();
+    }
+
+    public void init() {
+
+    }
+
+    private void loadProfiles() {
+        try {
+            String[] profiles = mOptions.getPreferences().node(KEY_PROFILES).childrenNames();
+            Arrays.sort(profiles);
+            DefaultComboBoxModel<String> defaultComboBoxModel = new DefaultComboBoxModel<>(profiles);
+            profileComboBox.setModel(defaultComboBoxModel);
+            if (profiles.length > 0) {
+                profilePanel.loadProfile(getProfileName());
+            } else {
+                defaultComboBoxModel.addElement("Default profile");
+            }
+        } catch (BackingStoreException | NullPointerException ex) {
+            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -35,20 +92,217 @@ public class MainPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setBackground(new java.awt.Color(0, 153, 153));
+        toolBar = new javax.swing.JToolBar();
+        profileComboBox = new javax.swing.JComboBox<>();
+        refreshButton = new javax.swing.JButton();
+        addButton = new javax.swing.JButton();
+        removeButton = new javax.swing.JButton();
+        helpButton = new javax.swing.JButton();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
+        filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(8, 0), new java.awt.Dimension(8, 0), new java.awt.Dimension(8, 32767));
+        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(16, 0), new java.awt.Dimension(16, 0), new java.awt.Dimension(16, 32767));
+        dryRunCheckBox = new javax.swing.JCheckBox();
+        createButton = new javax.swing.JButton();
+        profilePanel = new se.trixon.nbpackager_core.ProfilePanel();
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        setLayout(new java.awt.BorderLayout());
+
+        toolBar.setFloatable(false);
+        toolBar.setRollover(true);
+
+        profileComboBox.setEditable(true);
+        profileComboBox.setMaximumSize(new java.awt.Dimension(256, 32767));
+        profileComboBox.setPreferredSize(new java.awt.Dimension(256, 25));
+        profileComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                profileComboBoxActionPerformed(evt);
+            }
+        });
+        toolBar.add(profileComboBox);
+
+        refreshButton.setIcon(MaterialIcon._Navigation.REFRESH.getImageIcon(getIconSize()));
+        refreshButton.setToolTipText(Dict.REFRESH.toString());
+        refreshButton.setFocusable(false);
+        refreshButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        refreshButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        refreshButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshButtonActionPerformed(evt);
+            }
+        });
+        toolBar.add(refreshButton);
+
+        addButton.setIcon(MaterialIcon._Content.ADD.getImageIcon(getIconSize()));
+        addButton.setToolTipText(Dict.ADD.toString());
+        addButton.setFocusable(false);
+        addButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        addButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        addButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addButtonActionPerformed(evt);
+            }
+        });
+        toolBar.add(addButton);
+
+        removeButton.setIcon(MaterialIcon._Content.REMOVE.getImageIcon(getIconSize()));
+        removeButton.setToolTipText(Dict.REMOVE.toString());
+        removeButton.setFocusable(false);
+        removeButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        removeButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        removeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeButtonActionPerformed(evt);
+            }
+        });
+        toolBar.add(removeButton);
+
+        helpButton.setIcon(MaterialIcon._Action.HELP_OUTLINE.getImageIcon(getIconSize()));
+        helpButton.setToolTipText(Dict.HELP.toString());
+        helpButton.setFocusable(false);
+        helpButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        helpButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        helpButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                helpButtonActionPerformed(evt);
+            }
+        });
+        toolBar.add(helpButton);
+        toolBar.add(filler1);
+        toolBar.add(filler3);
+        toolBar.add(filler2);
+
+        dryRunCheckBox.setText(Dict.DRY_RUN.toString());
+        dryRunCheckBox.setFocusable(false);
+        dryRunCheckBox.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        dryRunCheckBox.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(dryRunCheckBox);
+
+        createButton.setIcon(MaterialIcon._Av.PLAY_ARROW.getImageIcon(getIconSize()));
+        createButton.setFocusable(false);
+        createButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        createButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        createButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                createButtonActionPerformed(evt);
+            }
+        });
+        toolBar.add(createButton);
+
+        add(toolBar, java.awt.BorderLayout.PAGE_START);
+        add(profilePanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void profileComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profileComboBoxActionPerformed
+        try {
+//            profilePanel.loadProfile(getProfileName());
+        } catch (NullPointerException e) {
+            //nvm
+        }
+    }//GEN-LAST:event_profileComboBoxActionPerformed
+
+    private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
+
+    }//GEN-LAST:event_refreshButtonActionPerformed
+
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+        String profileName = (String) profileComboBox.getEditor().getItem();
+        DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) profileComboBox.getModel();
+        if (model.getIndexOf(profileName) == -1) {
+//            profileComboBox.addItem(profileName);
+//            profilePanel.saveProfile(getProfileName());
+//            loadProfiles();
+//            profileComboBox.setSelectedItem(profileName);
+//            //FIXME Does not feel right but it works. Uncomitted editor?
+//            addButtonActionPerformed(evt);
+        }
+    }//GEN-LAST:event_addButtonActionPerformed
+
+    private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
+        if (profileComboBox.getSelectedItem() != null) {
+            String profileName = getProfileName();
+            profileComboBox.removeItem(profileName);
+            profilePanel.removeProfile(profileName);
+            loadProfiles();
+        }
+    }//GEN-LAST:event_removeButtonActionPerformed
+
+    private void helpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_helpButtonActionPerformed
+        displayHelp();
+    }//GEN-LAST:event_helpButtonActionPerformed
+
+    private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
+        profilePanel.saveProfile(getProfileName());
+
+//        if (linuxRadioButton.isSelected()) {
+//            mTarget = Target.LINUX;
+//        } else if (macRadioButton.isSelected()) {
+//            mTarget = Target.MAC;
+//        } else {
+//            mTarget = Target.WINDOWS;
+//        }
+//
+//        boolean validOptions = true;
+//
+//        if (!new File(mOptions.get(KEY_JLINK, "")).isFile()) {
+//            mLog.timedErr("Invalid option: jlink");
+//            validOptions = false;
+//        }
+//
+//        if (!mOptions.getJdkDir(mTarget).isDirectory()) {
+//            mLog.timedErr("Invalid option: Target OS jmods not a directory");
+//            validOptions = false;
+//        }
+//
+//        if (!validOptions) {
+//            return;
+//        }
+//
+//        if (!profilePanel.isValidOutput()) {
+//            mLog.timedErr("Invalid --output");
+//            return;
+//        }
+//
+//        ArrayList<String> command = profilePanel.getCommand(mTarget);
+//        command.add("--verbose");
+//        mLog.timedOut(String.join(" ", command));
+//
+//        if (!dryRunCheckBox.isSelected()) {
+//            createButton.setEnabled(false);
+//            progressBar.setIndeterminate(true);
+//            new Thread(() -> {
+//                ProcessBuilder processBuilder = new ProcessBuilder(command).inheritIO();
+//                processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);
+//                try {
+//                    Process process = processBuilder.start();
+//                    new ProcessLogThread(process.getInputStream(), 0, mLog).start();
+//                    new ProcessLogThread(process.getErrorStream(), -1, mLog).start();
+//
+//                    process.waitFor();
+//                } catch (IOException | InterruptedException ex) {
+//                    mLog.timedErr(ex.getMessage());
+//                }
+//                mLog.timedOut("Done.");
+//                SwingUtilities.invokeLater(() -> {
+//                    createButton.setEnabled(true);
+//                    progressBar.setIndeterminate(false);
+//                    progressBar.setValue(100);
+//                });
+//            }).start();
+//        }
+    }//GEN-LAST:event_createButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addButton;
+    private javax.swing.JButton createButton;
+    private javax.swing.JCheckBox dryRunCheckBox;
+    private javax.swing.Box.Filler filler1;
+    private javax.swing.Box.Filler filler2;
+    private javax.swing.Box.Filler filler3;
+    private javax.swing.JButton helpButton;
+    private javax.swing.JComboBox<String> profileComboBox;
+    private se.trixon.nbpackager_core.ProfilePanel profilePanel;
+    private javax.swing.JButton refreshButton;
+    private javax.swing.JButton removeButton;
+    private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables
 }

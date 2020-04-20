@@ -41,17 +41,13 @@ import org.openide.windows.TopComponent;
         preferredID = "PackagerTopComponent"
 )
 @Messages({
-    "CTL_PackagerAction=Packager",
-    "CTL_PackagerTopComponent=Packager Window",
-    "HINT_PackagerTopComponent=This is a Packager window"
+    "CTL_PackagerAction=Packager"
 })
 public final class PackagerTopComponent extends TopComponent {
 
     public PackagerTopComponent() {
         initComponents();
-        setName(Bundle.CTL_PackagerTopComponent());
-        setToolTipText(Bundle.HINT_PackagerTopComponent());
-
+        setName(Bundle.CTL_PackagerAction());
     }
 
     /**
@@ -60,39 +56,22 @@ public final class PackagerTopComponent extends TopComponent {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        mainPanel1 = new se.trixon.nbpackager_core.MainPanel();
-
-        javax.swing.GroupLayout mainPanel1Layout = new javax.swing.GroupLayout(mainPanel1);
-        mainPanel1.setLayout(mainPanel1Layout);
-        mainPanel1Layout.setHorizontalGroup(
-            mainPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        mainPanel1Layout.setVerticalGroup(
-            mainPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
+        mainPanel = new se.trixon.nbpackager_core.MainPanel();
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(mainPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(294, Short.MAX_VALUE))
+            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 626, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(mainPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(194, Short.MAX_VALUE))
+            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private se.trixon.nbpackager_core.MainPanel mainPanel1;
+    private se.trixon.nbpackager_core.MainPanel mainPanel;
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {

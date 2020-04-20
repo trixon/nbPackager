@@ -8,4 +8,25 @@
     </parent>
     <artifactId>core</artifactId>
     <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>se.trixon.almond</groupId>
+            <artifactId>almond-util</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.controlsfx</groupId>
+                    <artifactId>controlsfx</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-text</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <netbeans.hint.license>apache20</netbeans.hint.license>
+    </properties>
 </project>
