@@ -16,10 +16,26 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="sourceFileChooserPanel" pref="536" max="32767" attributes="0"/>
+                  <Component id="resourcesFileChooserPanel" max="32767" attributes="0"/>
+                  <Component id="appImageFileChooserPanel" alignment="0" max="32767" attributes="0"/>
+                  <Component id="criFileChooserPanel" alignment="0" max="32767" attributes="0"/>
+                  <Component id="destFileChooserPanel" alignment="0" max="32767" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Component id="sha256CheckBox" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="sha512CheckBox" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="324" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="fileChooserPanel1" pref="536" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <Component id="destPanel" min="-2" pref="345" max="-2" attributes="0"/>
+              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -27,19 +43,100 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="fileChooserPanel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="349" max="32767" attributes="0"/>
+              <Component id="sourceFileChooserPanel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="destFileChooserPanel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="resourcesFileChooserPanel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="appImageFileChooserPanel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="criFileChooserPanel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="sha256CheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="sha512CheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="destPanel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="se.trixon.almond.util.swing.dialogs.FileChooserPanel" name="fileChooserPanel1">
+    <Component class="se.trixon.almond.util.swing.dialogs.FileChooserPanel" name="sourceFileChooserPanel">
       <Properties>
         <Property name="checkBoxMode" type="boolean" value="false"/>
+        <Property name="header" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="Dict.SOURCE.toString()" type="code"/>
+        </Property>
         <Property name="mode" type="int" value="1"/>
-        <Property name="selected" type="boolean" value="true"/>
       </Properties>
     </Component>
+    <Component class="se.trixon.almond.util.swing.dialogs.FileChooserPanel" name="destFileChooserPanel">
+      <Properties>
+        <Property name="header" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="Dict.DESTINATION.toString()" type="code"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="se.trixon.almond.util.swing.dialogs.FileChooserPanel" name="resourcesFileChooserPanel">
+      <Properties>
+        <Property name="header" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="se/trixon/cricreator_core/Bundle.properties" key="resources" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="se.trixon.almond.util.swing.dialogs.FileChooserPanel" name="appImageFileChooserPanel">
+      <Properties>
+        <Property name="header" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="se/trixon/cricreator_core/Bundle.properties" key="template" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="se.trixon.almond.util.swing.dialogs.FileChooserPanel" name="criFileChooserPanel">
+      <Properties>
+        <Property name="header" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="se/trixon/cricreator_core/Bundle.properties" key="cri" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="sha256CheckBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="sha256sum"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="sha512CheckBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="sha512sum"/>
+      </Properties>
+    </Component>
+    <Container class="javax.swing.JPanel" name="destPanel">
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
+      <SubComponents>
+        <Component class="javax.swing.JCheckBox" name="appCheckBox">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="AppImage"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="linuxCheckBox">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Linux"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="macCheckBox">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="MaxOS"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="winCheckBox">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Windows"/>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
   </SubComponents>
 </Form>

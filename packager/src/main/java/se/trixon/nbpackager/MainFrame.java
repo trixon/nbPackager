@@ -16,9 +16,13 @@
 package se.trixon.nbpackager;
 
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
 import java.util.prefs.Preferences;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import javax.swing.JSeparator;
 import se.trixon.almond.util.AlmondOptions;
+import se.trixon.almond.util.AlmondOptionsPanel;
 import se.trixon.almond.util.AlmondUI;
 import se.trixon.almond.util.Dict;
 import se.trixon.almond.util.PomInfo;
@@ -27,6 +31,7 @@ import se.trixon.almond.util.swing.AboutModel;
 import se.trixon.almond.util.swing.SwingHelper;
 import se.trixon.almond.util.swing.dialogs.about.AboutPanel;
 import se.trixon.nbpackager_core.Options;
+import se.trixon.nbpackager_core.OptionsPanel;
 
 /**
  *
@@ -37,6 +42,7 @@ public class MainFrame extends javax.swing.JFrame {
     private static final AlmondUI sAlmondUI = AlmondUI.getInstance();
     private static final AlmondOptions sAlmondOptions = AlmondOptions.getInstance();
     private final Options mOptions = Options.getInstance();
+    private final OptionsPanel mOptionsPanel = new OptionsPanel();
 
     /**
      * Creates new form MainFrame
@@ -53,6 +59,7 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
         mainPanel = new se.trixon.nbpackager_core.MainPanel();
         logPanel = new se.trixon.almond.util.swing.LogPanel();
         menuBar = new javax.swing.JMenuBar();
@@ -72,10 +79,14 @@ public class MainFrame extends javax.swing.JFrame {
                 formWindowClosing(evt);
             }
         });
-        getContentPane().add(mainPanel, java.awt.BorderLayout.CENTER);
+
+        jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.add(mainPanel, java.awt.BorderLayout.PAGE_START);
 
         logPanel.setPreferredSize(new java.awt.Dimension(198, 300));
-        getContentPane().add(logPanel, java.awt.BorderLayout.PAGE_END);
+        jPanel1.add(logPanel, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
         fileMenu.setText(Dict.FILE_MENU.toString());
 
@@ -130,20 +141,20 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_quitMenuItemActionPerformed
 
     private void optionsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optionsMenuItemActionPerformed
-//        mOptionsPanel.load();
-//        Object[] options = new Object[]{AlmondOptionsPanel.getGlobalOptionsButton(mOptionsPanel), new JSeparator(), Dict.CANCEL, Dict.OK};
-//        int retval = JOptionPane.showOptionDialog(this,
-//                mOptionsPanel,
-//                Dict.OPTIONS.toString(),
-//                JOptionPane.DEFAULT_OPTION,
-//                JOptionPane.PLAIN_MESSAGE,
-//                null,
-//                options,
-//                Dict.OK);
-//
-//        if (retval == Arrays.asList(options).indexOf(Dict.OK)) {
-//            mOptionsPanel.save();
-//        }
+        mOptionsPanel.load();
+        Object[] options = new Object[]{AlmondOptionsPanel.getGlobalOptionsButton(mOptionsPanel), new JSeparator(), Dict.CANCEL, Dict.OK};
+        int retval = JOptionPane.showOptionDialog(this,
+                mOptionsPanel,
+                Dict.OPTIONS.toString(),
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                Dict.OK);
+
+        if (retval == Arrays.asList(options).indexOf(Dict.OK)) {
+            mOptionsPanel.save();
+        }
     }//GEN-LAST:event_optionsMenuItemActionPerformed
 
     private void helpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_helpMenuItemActionPerformed
@@ -176,7 +187,7 @@ public class MainFrame extends javax.swing.JFrame {
         sAlmondUI.addWindowWatcher(this);
         sAlmondUI.initoptions();
         mOptions.setPreferences(Preferences.userNodeForPackage(MainFrame.class));
-//        SwingHelper.makeWindowResizable(mOptionsPanel);
+        SwingHelper.makeWindowResizable(mOptionsPanel);
 
         PomInfo pomInfo = new PomInfo(MainFrame.class, "se.trixon.nbpackager", "nbpackager");
         AboutModel aboutModel = new AboutModel(SystemHelper.getBundle(MainFrame.class, "about"), SystemHelper.getResourceAsImageIcon(MainFrame.class, "about_logo.png"));
@@ -199,6 +210,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JMenuItem helpMenuItem;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private se.trixon.almond.util.swing.LogPanel logPanel;
     private se.trixon.nbpackager_core.MainPanel mainPanel;

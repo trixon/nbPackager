@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import se.trixon.almond.util.Dict;
 import static se.trixon.nbpackager_core.Options.*;
 
 /**
@@ -37,7 +38,9 @@ public class ProfilePanel extends javax.swing.JPanel {
     }
 
     void loadProfile(String profile) {
+        Preferences p = mOptions.getPreferences().node(KEY_PROFILES).node(profile);
 
+        sourceFileChooserPanel.setPath(p.get(KEY_PROFILE_SOURCE, ""));
     }
 
     void removeProfile(String profile) {
@@ -52,7 +55,7 @@ public class ProfilePanel extends javax.swing.JPanel {
     void saveProfile(String profile) {
         Preferences p = mOptions.getPreferences().node(KEY_PROFILES).node(profile);
 
-//        p.put(KEY_PROFILE_OUTPUT, outputFileChooserPanel.getPath());
+        p.put(KEY_PROFILE_SOURCE, sourceFileChooserPanel.getPath());
 //        List<String> vvv = jmodsList.getSelectedValuesList();
 //        p.put(KEY_PROFILE_MODULES, String.join(",", vvv));
 //        p.put(KEY_PROFILE_CUSTOM_MODULE_PATH, customModulePathTextArea.getText());
@@ -73,11 +76,47 @@ public class ProfilePanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        fileChooserPanel1 = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
+        sourceFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
+        destFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
+        resourcesFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
+        appImageFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
+        criFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
+        sha256CheckBox = new javax.swing.JCheckBox();
+        sha512CheckBox = new javax.swing.JCheckBox();
+        destPanel = new javax.swing.JPanel();
+        appCheckBox = new javax.swing.JCheckBox();
+        linuxCheckBox = new javax.swing.JCheckBox();
+        macCheckBox = new javax.swing.JCheckBox();
+        winCheckBox = new javax.swing.JCheckBox();
 
-        fileChooserPanel1.setCheckBoxMode(false);
-        fileChooserPanel1.setMode(1);
-        fileChooserPanel1.setSelected(true);
+        sourceFileChooserPanel.setCheckBoxMode(false);
+        sourceFileChooserPanel.setHeader(Dict.SOURCE.toString());
+        sourceFileChooserPanel.setMode(1);
+
+        destFileChooserPanel.setHeader(Dict.DESTINATION.toString());
+
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("se/trixon/cricreator_core/Bundle"); // NOI18N
+        resourcesFileChooserPanel.setHeader(bundle.getString("resources")); // NOI18N
+
+        appImageFileChooserPanel.setHeader(bundle.getString("template")); // NOI18N
+
+        criFileChooserPanel.setHeader(bundle.getString("cri")); // NOI18N
+
+        sha256CheckBox.setText("sha256sum");
+
+        sha512CheckBox.setText("sha512sum");
+
+        appCheckBox.setText("AppImage");
+        destPanel.add(appCheckBox);
+
+        linuxCheckBox.setText("Linux");
+        destPanel.add(linuxCheckBox);
+
+        macCheckBox.setText("MaxOS");
+        destPanel.add(macCheckBox);
+
+        winCheckBox.setText("Windows");
+        destPanel.add(winCheckBox);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -85,19 +124,57 @@ public class ProfilePanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(fileChooserPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(sourceFileChooserPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
+                    .addComponent(resourcesFileChooserPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(appImageFileChooserPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(criFileChooserPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(destFileChooserPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(sha256CheckBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(sha512CheckBox)
+                        .addGap(0, 324, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(destPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(fileChooserPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(349, Short.MAX_VALUE))
+                .addComponent(sourceFileChooserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(destFileChooserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(resourcesFileChooserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(appImageFileChooserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(criFileChooserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(sha256CheckBox)
+                    .addComponent(sha512CheckBox))
+                .addGap(18, 18, 18)
+                .addComponent(destPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private se.trixon.almond.util.swing.dialogs.FileChooserPanel fileChooserPanel1;
+    private javax.swing.JCheckBox appCheckBox;
+    private se.trixon.almond.util.swing.dialogs.FileChooserPanel appImageFileChooserPanel;
+    private se.trixon.almond.util.swing.dialogs.FileChooserPanel criFileChooserPanel;
+    private se.trixon.almond.util.swing.dialogs.FileChooserPanel destFileChooserPanel;
+    private javax.swing.JPanel destPanel;
+    private javax.swing.JCheckBox linuxCheckBox;
+    private javax.swing.JCheckBox macCheckBox;
+    private se.trixon.almond.util.swing.dialogs.FileChooserPanel resourcesFileChooserPanel;
+    private javax.swing.JCheckBox sha256CheckBox;
+    private javax.swing.JCheckBox sha512CheckBox;
+    private se.trixon.almond.util.swing.dialogs.FileChooserPanel sourceFileChooserPanel;
+    private javax.swing.JCheckBox winCheckBox;
     // End of variables declaration//GEN-END:variables
 }

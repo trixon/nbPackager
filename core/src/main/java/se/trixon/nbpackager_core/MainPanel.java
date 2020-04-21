@@ -16,6 +16,8 @@
 package se.trixon.nbpackager_core;
 
 import java.awt.Color;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,6 +68,16 @@ public class MainPanel extends javax.swing.JPanel {
     }
 
     public void init() {
+        profileComboBox.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (!profileComboBox.isPopupVisible() && e != null && e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    addButtonActionPerformed(null);
+                }
+            }
+        });
+
+        loadProfiles();
 
     }
 
@@ -99,9 +111,6 @@ public class MainPanel extends javax.swing.JPanel {
         removeButton = new javax.swing.JButton();
         helpButton = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
-        filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(8, 0), new java.awt.Dimension(8, 0), new java.awt.Dimension(8, 32767));
-        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(16, 0), new java.awt.Dimension(16, 0), new java.awt.Dimension(16, 32767));
-        dryRunCheckBox = new javax.swing.JCheckBox();
         createButton = new javax.swing.JButton();
         profilePanel = new se.trixon.nbpackager_core.ProfilePanel();
 
@@ -168,14 +177,6 @@ public class MainPanel extends javax.swing.JPanel {
         });
         toolBar.add(helpButton);
         toolBar.add(filler1);
-        toolBar.add(filler3);
-        toolBar.add(filler2);
-
-        dryRunCheckBox.setText(Dict.DRY_RUN.toString());
-        dryRunCheckBox.setFocusable(false);
-        dryRunCheckBox.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        dryRunCheckBox.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        toolBar.add(dryRunCheckBox);
 
         createButton.setIcon(MaterialIcon._Av.PLAY_ARROW.getImageIcon(getIconSize()));
         createButton.setFocusable(false);
@@ -194,7 +195,7 @@ public class MainPanel extends javax.swing.JPanel {
 
     private void profileComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profileComboBoxActionPerformed
         try {
-//            profilePanel.loadProfile(getProfileName());
+            profilePanel.loadProfile(getProfileName());
         } catch (NullPointerException e) {
             //nvm
         }
@@ -294,10 +295,7 @@ public class MainPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JButton createButton;
-    private javax.swing.JCheckBox dryRunCheckBox;
     private javax.swing.Box.Filler filler1;
-    private javax.swing.Box.Filler filler2;
-    private javax.swing.Box.Filler filler3;
     private javax.swing.JButton helpButton;
     private javax.swing.JComboBox<String> profileComboBox;
     private se.trixon.nbpackager_core.ProfilePanel profilePanel;
