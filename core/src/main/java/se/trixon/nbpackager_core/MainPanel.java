@@ -82,7 +82,6 @@ public class MainPanel extends javax.swing.JPanel {
         });
 
         loadProfiles();
-
     }
 
     private void loadProfiles() {
@@ -208,19 +207,19 @@ public class MainPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_profileComboBoxActionPerformed
 
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
-
+        profileComboBoxActionPerformed(evt);
     }//GEN-LAST:event_refreshButtonActionPerformed
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         String profileName = (String) profileComboBox.getEditor().getItem();
         DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) profileComboBox.getModel();
         if (model.getIndexOf(profileName) == -1) {
-//            profileComboBox.addItem(profileName);
-//            profilePanel.saveProfile(getProfileName());
-//            loadProfiles();
-//            profileComboBox.setSelectedItem(profileName);
-//            //FIXME Does not feel right but it works. Uncomitted editor?
-//            addButtonActionPerformed(evt);
+            profileComboBox.addItem(profileName);
+            profilePanel.saveProfile(getProfileName());
+            loadProfiles();
+            profileComboBox.setSelectedItem(profileName);
+            //FIXME Does not feel right but it works. Uncomitted editor?
+            addButtonActionPerformed(evt);
         }
     }//GEN-LAST:event_addButtonActionPerformed
 

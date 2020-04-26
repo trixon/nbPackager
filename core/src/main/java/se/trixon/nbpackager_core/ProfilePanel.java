@@ -37,14 +37,28 @@ public class ProfilePanel extends javax.swing.JPanel {
         initComponents();
     }
 
-    void loadProfile(String profile) {
-        Preferences p = mOptions.getPreferences().node(KEY_PROFILES).node(profile);
+    void loadProfile(String name) {
+        Preferences p = mOptions.getPreferences().node(KEY_PROFILES).node(name);
 
-        sourceFileChooserPanel.setPath(p.get(KEY_PROFILE_SOURCE, ""));
+        sourceFileChooserPanel.setPath(p.get(KEY_PROFILE_SOURCE_DIR, ""));
+        destFileChooserPanel.setPath(p.get(KEY_PROFILE_DEST_DIR, ""));
+        preScriptFileChooserPanel.setPath(p.get(KEY_PROFILE_SCRIPT_PRE, ""));
+        postScriptFileChooserPanel.setPath(p.get(KEY_PROFILE_SCRIPT_POST, ""));
+        resourcesFileChooserPanel.setPath(p.get(KEY_PROFILE_RESOURCES, ""));
+        appImageTemplateFileChooserPanel.setPath(p.get(KEY_PROFILE_APP_IMAGE_TEMPLATE, ""));
+        linuxFileChooserPanel.setPath(p.get(KEY_PROFILE_JRE_LINUX, ""));
+        macFileChooserPanel.setPath(p.get(KEY_PROFILE_JRE_MAC, ""));
+        windowsFileChooserPanel.setPath(p.get(KEY_PROFILE_JRE_WINDOWS, ""));
+        appCheckBox.setSelected(p.getBoolean(KEY_PROFILE_DEST_TYPE_APP_IMAGE, false));
+        linuxCheckBox.setSelected(p.getBoolean(KEY_PROFILE_DEST_TYPE_LINUX, false));
+        macCheckBox.setSelected(p.getBoolean(KEY_PROFILE_DEST_TYPE_MAC, false));
+        windowsCheckBox.setSelected(p.getBoolean(KEY_PROFILE_DEST_TYPE_WINDOWS, false));
+        sha256CheckBox.setSelected(p.getBoolean(KEY_PROFILE_CHECKSUM_SHA256, false));
+        sha512CheckBox.setSelected(p.getBoolean(KEY_PROFILE_CHECKSUM_SHA512, false));
     }
 
-    void removeProfile(String profile) {
-        Preferences p = mOptions.getPreferences().node(KEY_PROFILES).node(profile);
+    void removeProfile(String name) {
+        Preferences p = mOptions.getPreferences().node(KEY_PROFILES).node(name);
         try {
             p.removeNode();
         } catch (BackingStoreException ex) {
@@ -52,21 +66,24 @@ public class ProfilePanel extends javax.swing.JPanel {
         }
     }
 
-    void saveProfile(String profile) {
-        Preferences p = mOptions.getPreferences().node(KEY_PROFILES).node(profile);
+    void saveProfile(String name) {
+        Preferences p = mOptions.getPreferences().node(KEY_PROFILES).node(name);
 
-        p.put(KEY_PROFILE_SOURCE, sourceFileChooserPanel.getPath());
-//        List<String> vvv = jmodsList.getSelectedValuesList();
-//        p.put(KEY_PROFILE_MODULES, String.join(",", vvv));
-//        p.put(KEY_PROFILE_CUSTOM_MODULE_PATH, customModulePathTextArea.getText());
-//        p.put(KEY_PROFILE_CUSTOM_MODULES, customModulesTextArea.getText());
-//        p.putBoolean(KEY_PROFILE_BIND_SERVICES, bindServicesCheckBox.isSelected());
-//        p.putBoolean(KEY_PROFILE_IGNORE_SIGNING, signingCheckBox.isSelected());
-//        p.putBoolean(KEY_PROFILE_NO_HEADER, headersCheckBox.isSelected());
-//        p.putBoolean(KEY_PROFILE_NO_MAN, manCheckBox.isSelected());
-//        p.putBoolean(KEY_PROFILE_STRIP_DEBUG, stripCheckBox.isSelected());
-//        p.putInt(KEY_PROFILE_COMPRESS, compressComboBox.getSelectedIndex());
-//        p.putInt(KEY_PROFILE_ENDIAN, endianComboBox.getSelectedIndex());
+        p.put(KEY_PROFILE_SOURCE_DIR, sourceFileChooserPanel.getPath());
+        p.put(KEY_PROFILE_DEST_DIR, destFileChooserPanel.getPath());
+        p.put(KEY_PROFILE_SCRIPT_PRE, preScriptFileChooserPanel.getPath());
+        p.put(KEY_PROFILE_SCRIPT_POST, postScriptFileChooserPanel.getPath());
+        p.put(KEY_PROFILE_RESOURCES, resourcesFileChooserPanel.getPath());
+        p.put(KEY_PROFILE_APP_IMAGE_TEMPLATE, appImageTemplateFileChooserPanel.getPath());
+        p.put(KEY_PROFILE_JRE_LINUX, linuxFileChooserPanel.getPath());
+        p.put(KEY_PROFILE_JRE_MAC, macFileChooserPanel.getPath());
+        p.put(KEY_PROFILE_JRE_WINDOWS, windowsFileChooserPanel.getPath());
+        p.putBoolean(KEY_PROFILE_DEST_TYPE_APP_IMAGE, appCheckBox.isSelected());
+        p.putBoolean(KEY_PROFILE_DEST_TYPE_LINUX, linuxCheckBox.isSelected());
+        p.putBoolean(KEY_PROFILE_DEST_TYPE_MAC, macCheckBox.isSelected());
+        p.putBoolean(KEY_PROFILE_DEST_TYPE_WINDOWS, windowsCheckBox.isSelected());
+        p.putBoolean(KEY_PROFILE_CHECKSUM_SHA256, sha256CheckBox.isSelected());
+        p.putBoolean(KEY_PROFILE_CHECKSUM_SHA512, sha512CheckBox.isSelected());
     }
 
     /**
@@ -80,10 +97,10 @@ public class ProfilePanel extends javax.swing.JPanel {
         firstPanel = new javax.swing.JPanel();
         sourceFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
         destFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
-        preXFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
-        postXFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
+        preScriptFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
+        postScriptFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
         resourcesFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
-        appImageFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
+        appImageTemplateFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
         jrePanel = new javax.swing.JPanel();
         linuxFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
         macFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
@@ -92,7 +109,7 @@ public class ProfilePanel extends javax.swing.JPanel {
         appCheckBox = new javax.swing.JCheckBox();
         linuxCheckBox = new javax.swing.JCheckBox();
         macCheckBox = new javax.swing.JCheckBox();
-        winCheckBox = new javax.swing.JCheckBox();
+        windowsCheckBox = new javax.swing.JCheckBox();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(64, 0), new java.awt.Dimension(64, 0), new java.awt.Dimension(64, 32767));
         sha512CheckBox = new javax.swing.JCheckBox();
         sha256CheckBox = new javax.swing.JCheckBox();
@@ -109,20 +126,20 @@ public class ProfilePanel extends javax.swing.JPanel {
         destFileChooserPanel.setHeader(Dict.DESTINATION.toString());
         firstPanel.add(destFileChooserPanel);
 
-        preXFileChooserPanel.setCheckBoxMode(false);
-        preXFileChooserPanel.setHeader("PRE execution script");
-        preXFileChooserPanel.setMode(1);
-        firstPanel.add(preXFileChooserPanel);
+        preScriptFileChooserPanel.setCheckBoxMode(false);
+        preScriptFileChooserPanel.setHeader("PRE execution script");
+        preScriptFileChooserPanel.setMode(1);
+        firstPanel.add(preScriptFileChooserPanel);
 
-        postXFileChooserPanel.setHeader("POST execution script");
-        firstPanel.add(postXFileChooserPanel);
+        postScriptFileChooserPanel.setHeader("POST execution script");
+        firstPanel.add(postScriptFileChooserPanel);
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("se/trixon/cricreator_core/Bundle"); // NOI18N
         resourcesFileChooserPanel.setHeader(bundle.getString("resources")); // NOI18N
         firstPanel.add(resourcesFileChooserPanel);
 
-        appImageFileChooserPanel.setHeader(bundle.getString("template")); // NOI18N
-        firstPanel.add(appImageFileChooserPanel);
+        appImageTemplateFileChooserPanel.setHeader(bundle.getString("template")); // NOI18N
+        firstPanel.add(appImageTemplateFileChooserPanel);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 0;
@@ -153,11 +170,11 @@ public class ProfilePanel extends javax.swing.JPanel {
         linuxCheckBox.setText("Linux");
         destPanel.add(linuxCheckBox);
 
-        macCheckBox.setText("MaxOS");
+        macCheckBox.setText("Mac");
         destPanel.add(macCheckBox);
 
-        winCheckBox.setText("Windows");
-        destPanel.add(winCheckBox);
+        windowsCheckBox.setText("Windows");
+        destPanel.add(windowsCheckBox);
         destPanel.add(filler1);
 
         sha512CheckBox.setText("sha512sum");
@@ -175,7 +192,7 @@ public class ProfilePanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox appCheckBox;
-    private se.trixon.almond.util.swing.dialogs.FileChooserPanel appImageFileChooserPanel;
+    private se.trixon.almond.util.swing.dialogs.FileChooserPanel appImageTemplateFileChooserPanel;
     private se.trixon.almond.util.swing.dialogs.FileChooserPanel destFileChooserPanel;
     private javax.swing.JPanel destPanel;
     private javax.swing.Box.Filler filler1;
@@ -185,13 +202,13 @@ public class ProfilePanel extends javax.swing.JPanel {
     private se.trixon.almond.util.swing.dialogs.FileChooserPanel linuxFileChooserPanel;
     private javax.swing.JCheckBox macCheckBox;
     private se.trixon.almond.util.swing.dialogs.FileChooserPanel macFileChooserPanel;
-    private se.trixon.almond.util.swing.dialogs.FileChooserPanel postXFileChooserPanel;
-    private se.trixon.almond.util.swing.dialogs.FileChooserPanel preXFileChooserPanel;
+    private se.trixon.almond.util.swing.dialogs.FileChooserPanel postScriptFileChooserPanel;
+    private se.trixon.almond.util.swing.dialogs.FileChooserPanel preScriptFileChooserPanel;
     private se.trixon.almond.util.swing.dialogs.FileChooserPanel resourcesFileChooserPanel;
     private javax.swing.JCheckBox sha256CheckBox;
     private javax.swing.JCheckBox sha512CheckBox;
     private se.trixon.almond.util.swing.dialogs.FileChooserPanel sourceFileChooserPanel;
-    private javax.swing.JCheckBox winCheckBox;
+    private javax.swing.JCheckBox windowsCheckBox;
     private se.trixon.almond.util.swing.dialogs.FileChooserPanel windowsFileChooserPanel;
     // End of variables declaration//GEN-END:variables
 }

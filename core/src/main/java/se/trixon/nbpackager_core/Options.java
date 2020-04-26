@@ -24,7 +24,21 @@ import se.trixon.almond.util.OptionsBase;
 public class Options extends OptionsBase {
 
     public static final String KEY_PROFILES = "profiles";
-    public static final String KEY_PROFILE_SOURCE = "source";
+    public static final String KEY_PROFILE_APP_IMAGE_TEMPLATE = "app_image_template";
+    public static final String KEY_PROFILE_CHECKSUM_SHA256 = "checksum.sha256";
+    public static final String KEY_PROFILE_CHECKSUM_SHA512 = "checksum.sha512";
+    public static final String KEY_PROFILE_DEST_DIR = "dest";
+    public static final String KEY_PROFILE_DEST_TYPE_APP_IMAGE = "dest_type.appimae";
+    public static final String KEY_PROFILE_DEST_TYPE_LINUX = "dest_type.linux";
+    public static final String KEY_PROFILE_DEST_TYPE_MAC = "dest_type.mac";
+    public static final String KEY_PROFILE_DEST_TYPE_WINDOWS = "dest_type.windows";
+    public static final String KEY_PROFILE_JRE_LINUX = "jre.linux";
+    public static final String KEY_PROFILE_JRE_MAC = "jre.mac";
+    public static final String KEY_PROFILE_JRE_WINDOWS = "jre.windows";
+    public static final String KEY_PROFILE_RESOURCES = "resources";
+    public static final String KEY_PROFILE_SCRIPT_POST = "script.post";
+    public static final String KEY_PROFILE_SCRIPT_PRE = "script.pre";
+    public static final String KEY_PROFILE_SOURCE_DIR = "source";
     public static final String OPT_APP_IMAGE_OPTIONS = "appImage.options";
     public static final String OPT_APP_IMAGE_TOOL = "appImage.tool";
 

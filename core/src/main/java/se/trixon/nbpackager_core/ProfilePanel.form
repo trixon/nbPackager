@@ -44,14 +44,14 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="se.trixon.almond.util.swing.dialogs.FileChooserPanel" name="preXFileChooserPanel">
+        <Component class="se.trixon.almond.util.swing.dialogs.FileChooserPanel" name="preScriptFileChooserPanel">
           <Properties>
             <Property name="checkBoxMode" type="boolean" value="false"/>
             <Property name="header" type="java.lang.String" value="PRE execution script"/>
             <Property name="mode" type="int" value="1"/>
           </Properties>
         </Component>
-        <Component class="se.trixon.almond.util.swing.dialogs.FileChooserPanel" name="postXFileChooserPanel">
+        <Component class="se.trixon.almond.util.swing.dialogs.FileChooserPanel" name="postScriptFileChooserPanel">
           <Properties>
             <Property name="header" type="java.lang.String" value="POST execution script"/>
           </Properties>
@@ -63,7 +63,7 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="se.trixon.almond.util.swing.dialogs.FileChooserPanel" name="appImageFileChooserPanel">
+        <Component class="se.trixon.almond.util.swing.dialogs.FileChooserPanel" name="appImageTemplateFileChooserPanel">
           <Properties>
             <Property name="header" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
               <ResourceString bundle="se/trixon/cricreator_core/Bundle.properties" key="template" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
@@ -122,10 +122,10 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="macCheckBox">
           <Properties>
-            <Property name="text" type="java.lang.String" value="MaxOS"/>
+            <Property name="text" type="java.lang.String" value="Mac"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JCheckBox" name="winCheckBox">
+        <Component class="javax.swing.JCheckBox" name="windowsCheckBox">
           <Properties>
             <Property name="text" type="java.lang.String" value="Windows"/>
           </Properties>
