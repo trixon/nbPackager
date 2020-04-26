@@ -6,7 +6,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <name>parent</name>
     <packaging>pom</packaging>
-    <description>Packages NetBeans Platform Application with a CRI for AppImage, Linux, MacOS and Windows.&lt;br/&gt;https://trixon.se/projects/nbpackager/</description>
+    <description>Packages NetBeans Platform Application with a JRE for AppImage, Linux, MacOS and Windows.&lt;br/&gt;https://trixon.se/projects/nbpackager/</description>
 
     <url>https://trixon.se/projects/nbpackager</url>
 

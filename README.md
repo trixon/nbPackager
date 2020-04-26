@@ -1,2 +1,2 @@
 # nbPackager
-Packages NetBeans Platform Application with a CRI for AppImage, Linux, MacOS and Windows
+Packages NetBeans Platform Application with a JRE for AppImage, Linux, MacOS and Windows

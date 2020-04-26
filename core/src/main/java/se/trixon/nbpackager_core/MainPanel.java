@@ -190,6 +190,8 @@ public class MainPanel extends javax.swing.JPanel {
         toolBar.add(createButton);
 
         add(toolBar, java.awt.BorderLayout.PAGE_START);
+
+        profilePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 8, 0, 8));
         add(profilePanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
