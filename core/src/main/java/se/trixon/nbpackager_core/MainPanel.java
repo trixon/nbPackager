@@ -55,6 +55,10 @@ public class MainPanel extends javax.swing.JPanel {
         SystemHelper.desktopBrowse("https://trixon.se/projects/nbpackager");
     }
 
+    public JButton getHelpButton() {
+        return helpButton;
+    }
+
     public static int getIconSize() {
         return ICON_SIZE;
     }

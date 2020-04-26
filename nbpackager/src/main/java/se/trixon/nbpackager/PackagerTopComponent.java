@@ -19,7 +19,11 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.util.NbBundle.Messages;
+import org.openide.util.NbPreferences;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
 import org.openide.windows.TopComponent;
+import se.trixon.nbpackager_core.Options;
 
 /**
  * Top component which displays something.
@@ -45,9 +49,36 @@ import org.openide.windows.TopComponent;
 })
 public final class PackagerTopComponent extends TopComponent {
 
+    private InputOutput mInputOutput = null;
+
     public PackagerTopComponent() {
         initComponents();
         setName(Bundle.CTL_PackagerAction());
+        init();
+    }
+
+    private void init() {
+        mainPanel.getLog().setOut(s -> {
+            if (mInputOutput == null) {
+                mInputOutput = IOProvider.getDefault().getIO("CRI Creator", true);
+            }
+            mInputOutput.select();
+            mInputOutput.getOut().println(s);
+        });
+        mainPanel.getLog().setErr(s -> {
+            if (mInputOutput == null) {
+                mInputOutput = IOProvider.getDefault().getIO("CRI Creator", true);
+            }
+            mInputOutput.select();
+            mInputOutput.getErr().println(s);
+        });
+
+        if (Options.getInstance().getPreferences() == null) {
+            Options.getInstance().setPreferences(NbPreferences.forModule(PackagerOptionsPanel.class));
+        }
+
+        mainPanel.init();
+        mainPanel.getHelpButton().setVisible(true);
     }
 
     /**
