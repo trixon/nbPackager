@@ -16,9 +16,12 @@
 package se.trixon.nbpackager_core;
 
 import java.awt.Color;
+import java.awt.Component;
 import javax.swing.JButton;
+import javax.swing.event.DocumentListener;
 import se.trixon.almond.util.GraphicsHelper;
 import se.trixon.almond.util.icons.material.swing.MaterialIcon;
+import se.trixon.almond.util.swing.dialogs.FileChooserPanel;
 import static se.trixon.nbpackager_core.Options.*;
 
 /**
@@ -38,11 +41,21 @@ public class OptionsPanel extends javax.swing.JPanel {
     }
 
     public void load() {
-        appImageFileChooserPanel.setPath(mOptions.get(OPT_APP_IMAGE, "/path/to/appimagetool-x86_64.AppImage"));
+        appImageFileChooserPanel.setPath(mOptions.get(OPT_APP_IMAGE_TOOL, "/path/to/appimagetool-x86_64.AppImage"));
+        appimagetoolOptionsTextField.setText(mOptions.get(OPT_APP_IMAGE_OPTIONS, "-nv"));
     }
 
     public void save() {
-        mOptions.put(OPT_APP_IMAGE, appImageFileChooserPanel.getPath());
+        mOptions.put(OPT_APP_IMAGE_TOOL, appImageFileChooserPanel.getPath());
+        mOptions.put(OPT_APP_IMAGE_OPTIONS, appimagetoolOptionsTextField.getText());
+    }
+
+    public void setDocumentListener(DocumentListener documentListener) {
+        for (Component component : getComponents()) {
+            if (component instanceof FileChooserPanel) {
+                ((FileChooserPanel) component).getTextField().getDocument().addDocumentListener(documentListener);
+            }
+        }
     }
 
     /**
@@ -53,8 +66,12 @@ public class OptionsPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         appImageFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
+        appimagetoolOptionsjLabel = new javax.swing.JLabel();
+        appimagetoolOptionsTextField = new javax.swing.JTextField();
 
-        appImageFileChooserPanel.setHeader("AppImage Tool");
+        appImageFileChooserPanel.setHeader("AppImageTool");
+
+        appimagetoolOptionsjLabel.setText("AppImageTool options");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -62,7 +79,12 @@ public class OptionsPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(appImageFileChooserPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(appImageFileChooserPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(appimagetoolOptionsjLabel)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(appimagetoolOptionsTextField))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -70,11 +92,17 @@ public class OptionsPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(appImageFileChooserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(241, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(appimagetoolOptionsjLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(appimagetoolOptionsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(179, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private se.trixon.almond.util.swing.dialogs.FileChooserPanel appImageFileChooserPanel;
+    private javax.swing.JTextField appimagetoolOptionsTextField;
+    private javax.swing.JLabel appimagetoolOptionsjLabel;
     // End of variables declaration//GEN-END:variables
 }

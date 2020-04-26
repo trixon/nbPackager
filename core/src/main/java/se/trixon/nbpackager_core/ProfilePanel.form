@@ -17,25 +17,26 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="sourceFileChooserPanel" pref="536" max="32767" attributes="0"/>
-                  <Component id="resourcesFileChooserPanel" max="32767" attributes="0"/>
-                  <Component id="appImageFileChooserPanel" alignment="0" max="32767" attributes="0"/>
-                  <Component id="criFileChooserPanel" alignment="0" max="32767" attributes="0"/>
-                  <Component id="destFileChooserPanel" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
-                      <Component id="sha256CheckBox" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="sha512CheckBox" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="324" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="sourceFileChooserPanel" pref="752" max="32767" attributes="0"/>
+                          <Component id="resourcesFileChooserPanel" max="32767" attributes="0"/>
+                          <Component id="appImageFileChooserPanel" alignment="0" max="32767" attributes="0"/>
+                          <Component id="criFileChooserPanel" alignment="0" max="32767" attributes="0"/>
+                          <Component id="destFileChooserPanel" alignment="0" max="32767" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="sha256CheckBox" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="sha512CheckBox" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="530" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
                   </Group>
+                  <Component id="destPanel" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-          </Group>
-          <Group type="102" alignment="0" attributes="0">
-              <Component id="destPanel" min="-2" pref="345" max="-2" attributes="0"/>
-              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -57,7 +58,7 @@
                   <Component id="sha256CheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="sha512CheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="destPanel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
           </Group>

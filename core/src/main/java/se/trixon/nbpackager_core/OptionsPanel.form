@@ -16,9 +16,16 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="appImageFileChooserPanel" pref="388" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="appImageFileChooserPanel" alignment="0" pref="388" max="32767" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Component id="appimagetoolOptionsjLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  </Group>
+                  <Component id="appimagetoolOptionsTextField" max="32767" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -28,7 +35,11 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="appImageFileChooserPanel" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="241" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="appimagetoolOptionsjLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="appimagetoolOptionsTextField" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="179" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -36,8 +47,15 @@
   <SubComponents>
     <Component class="se.trixon.almond.util.swing.dialogs.FileChooserPanel" name="appImageFileChooserPanel">
       <Properties>
-        <Property name="header" type="java.lang.String" value="AppImage Tool"/>
+        <Property name="header" type="java.lang.String" value="AppImageTool"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="appimagetoolOptionsjLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="AppImageTool options"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="appimagetoolOptionsTextField">
     </Component>
   </SubComponents>
 </Form>

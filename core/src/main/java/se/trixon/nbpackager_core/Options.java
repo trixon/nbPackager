@@ -25,7 +25,8 @@ public class Options extends OptionsBase {
 
     public static final String KEY_PROFILES = "profiles";
     public static final String KEY_PROFILE_SOURCE = "source";
-    public static final String OPT_APP_IMAGE = "appImage";
+    public static final String OPT_APP_IMAGE_OPTIONS = "appImage.options";
+    public static final String OPT_APP_IMAGE_TOOL = "appImage.tool";
 
     public static Options getInstance() {
         return OptionsHolder.INSTANCE;
