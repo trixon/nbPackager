@@ -149,5 +149,12 @@
         </Constraint>
       </Constraints>
     </Component>
+    <Component class="javax.swing.JProgressBar" name="progressBar">
+      <Constraints>
+        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+          <BorderConstraints direction="Last"/>
+        </Constraint>
+      </Constraints>
+    </Component>
   </SubComponents>
 </Form>

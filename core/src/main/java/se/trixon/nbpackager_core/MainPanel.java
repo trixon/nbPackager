@@ -18,6 +18,7 @@ package se.trixon.nbpackager_core;
 import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -116,6 +117,7 @@ public class MainPanel extends javax.swing.JPanel {
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         createButton = new javax.swing.JButton();
         profilePanel = new se.trixon.nbpackager_core.ProfilePanel();
+        progressBar = new javax.swing.JProgressBar();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -196,6 +198,7 @@ public class MainPanel extends javax.swing.JPanel {
 
         profilePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 8, 0, 8));
         add(profilePanel, java.awt.BorderLayout.CENTER);
+        add(progressBar, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
 
     private void profileComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profileComboBoxActionPerformed
@@ -237,8 +240,15 @@ public class MainPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_helpButtonActionPerformed
 
     private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
-        profilePanel.saveProfile(getProfileName());
+        Profile profile = profilePanel.saveProfile(getProfileName());
 
+        mLog.timedOut(LocalDateTime.now().toString() + " validating settings");
+
+        if (profile.isValid()) {
+            mLog.timedOut(profile.toDebugString());
+        } else {
+            mLog.timedErr(profile.getValidationError());
+        }
 //        if (linuxRadioButton.isSelected()) {
 //            mTarget = Target.LINUX;
 //        } else if (macRadioButton.isSelected()) {
@@ -304,6 +314,7 @@ public class MainPanel extends javax.swing.JPanel {
     private javax.swing.JButton helpButton;
     private javax.swing.JComboBox<String> profileComboBox;
     private se.trixon.nbpackager_core.ProfilePanel profilePanel;
+    private javax.swing.JProgressBar progressBar;
     private javax.swing.JButton refreshButton;
     private javax.swing.JButton removeButton;
     private javax.swing.JToolBar toolBar;

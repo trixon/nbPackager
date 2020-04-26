@@ -60,14 +60,14 @@ public final class PackagerTopComponent extends TopComponent {
     private void init() {
         mainPanel.getLog().setOut(s -> {
             if (mInputOutput == null) {
-                mInputOutput = IOProvider.getDefault().getIO("CRI Creator", true);
+                mInputOutput = IOProvider.getDefault().getIO("Packager", true);
             }
             mInputOutput.select();
             mInputOutput.getOut().println(s);
         });
         mainPanel.getLog().setErr(s -> {
             if (mInputOutput == null) {
-                mInputOutput = IOProvider.getDefault().getIO("CRI Creator", true);
+                mInputOutput = IOProvider.getDefault().getIO("Packager", true);
             }
             mInputOutput.select();
             mInputOutput.getErr().println(s);
