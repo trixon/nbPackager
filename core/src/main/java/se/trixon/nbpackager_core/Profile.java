@@ -37,6 +37,7 @@ public class Profile {
     private File mPreScript;
     private File mResources;
     private File mSource;
+    private boolean mDryRun;
     private boolean mTargetAny;
     private boolean mTargetAppImage;
     private boolean mTargetLinux;
@@ -91,6 +92,10 @@ public class Profile {
         return mChecksumSha512;
     }
 
+    public boolean isDryRun() {
+        return mDryRun;
+    }
+
     public boolean isTargetAny() {
         return mTargetAny;
     }
@@ -125,6 +130,10 @@ public class Profile {
 
     public void setDest(File dest) {
         mDest = dest;
+    }
+
+    public void setDryRun(boolean dryRun) {
+        mDryRun = dryRun;
     }
 
     public void setJreLinux(File jreLinux) {

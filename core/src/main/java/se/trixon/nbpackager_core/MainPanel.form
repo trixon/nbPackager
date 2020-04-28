@@ -120,6 +120,15 @@
             <AuxValue name="classDetails" type="java.lang.String" value="Box.Filler.VerticalStrut"/>
           </AuxValues>
         </Component>
+        <Component class="javax.swing.JCheckBox" name="dryRunCheckBox">
+          <Properties>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="Dict.DRY_RUN.toString()" type="code"/>
+            </Property>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+        </Component>
         <Component class="javax.swing.JButton" name="cancelButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">

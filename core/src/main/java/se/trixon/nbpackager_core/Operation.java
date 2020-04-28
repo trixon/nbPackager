@@ -15,7 +15,11 @@
  */
 package se.trixon.nbpackager_core;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import se.trixon.almond.util.Log;
+import se.trixon.almond.util.ProcessLogThread;
 
 /**
  *
@@ -23,6 +27,7 @@ import se.trixon.almond.util.Log;
  */
 public class Operation {
 
+    private Process mCurrentProcess;
     private boolean mInterrupted;
     private final Log mLog;
     private final Profile mProfile;
@@ -34,18 +39,52 @@ public class Operation {
 
     public void start() {
         long startTime = System.currentTimeMillis();
-        mLog.timedOut("start & wait");
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException ex) {
-            mInterrupted = true;
+
+        if (mProfile.getPreScript() != null) {
+            mLog.out("Run PRE execution script");
+            executeScript(mProfile.getPreScript());
+        }
+
+        if (!mInterrupted && mProfile.getPostScript() != null) {
+            mLog.out("Run POST execution script");
+            executeScript(mProfile.getPostScript());
         }
 
         if (mInterrupted) {
-            mLog.timedOut("Interrupted");
+            mLog.err("\nOperation interrupted");
         } else {
-            mLog.timedOut("done");
+            mLog.out("\nOperation completed");
         }
     }
 
+    private void execute(ArrayList<String> command) {
+        mLog.out(getHeader() + String.join(" ", command));
+
+        if (!mProfile.isDryRun()) {
+            ProcessBuilder processBuilder = new ProcessBuilder(command).inheritIO();
+            processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);
+            try {
+                mCurrentProcess = processBuilder.start();
+                new ProcessLogThread(mCurrentProcess.getInputStream(), 0, mLog).start();
+                new ProcessLogThread(mCurrentProcess.getErrorStream(), -1, mLog).start();
+                Thread.sleep(1000);
+                mCurrentProcess.waitFor();
+            } catch (IOException ex) {
+                mLog.timedErr(ex.getMessage());
+            } catch (InterruptedException ex) {
+                mCurrentProcess.destroy();
+                mInterrupted = true;
+            }
+        }
+    }
+
+    private void executeScript(File script) {
+        ArrayList<String> command = new ArrayList<>();
+        command.add(script.getAbsolutePath());
+        execute(command);
+    }
+
+    private String getHeader() {
+        return mProfile.isDryRun() ? "execute: (dry-run) " : "execute: ";
+    }
 }

@@ -106,6 +106,8 @@ public class MainPanel extends javax.swing.JPanel {
     private void setRunState(RunState runState) {
         runButton.setVisible(runState == RunState.STARTABLE);
         cancelButton.setVisible(runState == RunState.CANCELABLE);
+        progressBar.setIndeterminate(runState == RunState.CANCELABLE);
+        dryRunCheckBox.setEnabled(runState == RunState.STARTABLE);
     }
 
     /**
@@ -122,6 +124,7 @@ public class MainPanel extends javax.swing.JPanel {
         removeButton = new javax.swing.JButton();
         helpButton = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
+        dryRunCheckBox = new javax.swing.JCheckBox();
         cancelButton = new javax.swing.JButton();
         runButton = new javax.swing.JButton();
         profilePanel = new se.trixon.nbpackager_core.ProfilePanel();
@@ -190,6 +193,11 @@ public class MainPanel extends javax.swing.JPanel {
         });
         toolBar.add(helpButton);
         toolBar.add(filler1);
+
+        dryRunCheckBox.setText(Dict.DRY_RUN.toString());
+        dryRunCheckBox.setFocusable(false);
+        dryRunCheckBox.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(dryRunCheckBox);
 
         cancelButton.setIcon(MaterialIcon._Navigation.CANCEL.getImageIcon(getIconSize()));
         cancelButton.setFocusable(false);
@@ -260,90 +268,35 @@ public class MainPanel extends javax.swing.JPanel {
 
     private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
         Profile profile = profilePanel.saveProfile(getProfileName());
-
+        profile.setDryRun(dryRunCheckBox.isSelected());
         mLog.timedOut(LocalDateTime.now().toString() + " validating settings");
 
         if (profile.isValid()) {
             mLog.timedOut(profile.toDebugString());
+            setRunState(RunState.CANCELABLE);
+            mOperationThread = new Thread(() -> {
+                Operation operation = new Operation(profile, mLog);
+                operation.start();
+                setRunState(RunState.STARTABLE);
+                progressBar.setValue(100);
+            });
+            mOperationThread.setName("Operation");
+            mOperationThread.start();
         } else {
             mLog.timedErr(profile.getValidationError());
         }
-
-        setRunState(RunState.CANCELABLE);
-        mOperationThread = new Thread(() -> {
-            Operation operation = new Operation(profile, mLog);
-            operation.start();
-            setRunState(RunState.STARTABLE);
-        });
-        mOperationThread.setName("Operation");
-        mOperationThread.start();
-
-//        if (linuxRadioButton.isSelected()) {
-//            mTarget = Target.LINUX;
-//        } else if (macRadioButton.isSelected()) {
-//            mTarget = Target.MAC;
-//        } else {
-//            mTarget = Target.WINDOWS;
-//        }
-//
-//        boolean validOptions = true;
-//
-//        if (!new File(mOptions.get(KEY_JLINK, "")).isFile()) {
-//            mLog.timedErr("Invalid option: jlink");
-//            validOptions = false;
-//        }
-//
-//        if (!mOptions.getJdkDir(mTarget).isDirectory()) {
-//            mLog.timedErr("Invalid option: Target OS jmods not a directory");
-//            validOptions = false;
-//        }
-//
-//        if (!validOptions) {
-//            return;
-//        }
-//
-//        if (!profilePanel.isValidOutput()) {
-//            mLog.timedErr("Invalid --output");
-//            return;
-//        }
-//
-//        ArrayList<String> command = profilePanel.getCommand(mTarget);
-//        command.add("--verbose");
-//        mLog.timedOut(String.join(" ", command));
-//
-//        if (!dryRunCheckBox.isSelected()) {
-//            createButton.setEnabled(false);
-//            progressBar.setIndeterminate(true);
-//            new Thread(() -> {
-//                ProcessBuilder processBuilder = new ProcessBuilder(command).inheritIO();
-//                processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);
-//                try {
-//                    Process process = processBuilder.start();
-//                    new ProcessLogThread(process.getInputStream(), 0, mLog).start();
-//                    new ProcessLogThread(process.getErrorStream(), -1, mLog).start();
-//
-//                    process.waitFor();
-//                } catch (IOException | InterruptedException ex) {
-//                    mLog.timedErr(ex.getMessage());
-//                }
-//                mLog.timedOut("Done.");
-//                SwingUtilities.invokeLater(() -> {
-//                    createButton.setEnabled(true);
-//                    progressBar.setIndeterminate(false);
-//                    progressBar.setValue(100);
-//                });
-//            }).start();
-//        }
     }//GEN-LAST:event_runButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         mOperationThread.interrupt();
         setRunState(RunState.STARTABLE);
+        progressBar.setValue(0);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JButton cancelButton;
+    private javax.swing.JCheckBox dryRunCheckBox;
     private javax.swing.Box.Filler filler1;
     private javax.swing.JButton helpButton;
     private javax.swing.JComboBox<String> profileComboBox;
