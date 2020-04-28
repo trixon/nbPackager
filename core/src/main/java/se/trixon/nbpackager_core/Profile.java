@@ -18,6 +18,7 @@ package se.trixon.nbpackager_core;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.LinkedHashMap;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import se.trixon.almond.util.BooleanHelper;
 
@@ -28,6 +29,7 @@ import se.trixon.almond.util.BooleanHelper;
 public class Profile {
 
     private File mAppImageTemplate;
+    private String mBasename;
     private boolean mChecksumSha256;
     private boolean mChecksumSha512;
     private File mDestDir;
@@ -52,6 +54,10 @@ public class Profile {
 
     public File getAppImageTemplate() {
         return mAppImageTemplate;
+    }
+
+    public String getBasename() {
+        return mBasename;
     }
 
     public File getDestDir() {
@@ -323,7 +329,9 @@ public class Profile {
         FilenameFilter filter = (dir, name) -> name.endsWith(".zip");
 
         try {
-            mSourceFile = new File(mSourceDir, mSourceDir.list(filter)[0]);
+            String firstFilename = mSourceDir.list(filter)[0];
+            mBasename = FilenameUtils.getBaseName(firstFilename);
+            mSourceFile = new File(mSourceDir, firstFilename);
         } catch (Exception e) {
             mSourceFile = null;
         }

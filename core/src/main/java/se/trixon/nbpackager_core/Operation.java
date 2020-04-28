@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.model.ZipParameters;
+import org.apache.commons.io.FileUtils;
 import se.trixon.almond.util.Log;
 import se.trixon.almond.util.ProcessLogThread;
 
@@ -54,6 +56,22 @@ public class Operation {
             unzip();
         }
 
+        if (!mInterrupted & mProfile.isTargetAny()) {
+            createPackage("any");
+        }
+
+        if (!mInterrupted & mProfile.isTargetLinux()) {
+            createPackage("linux");
+        }
+
+        if (!mInterrupted & mProfile.isTargetMac()) {
+            createPackage("mac");
+        }
+
+        if (!mInterrupted & mProfile.isTargetWindows()) {
+            createPackage("windows");
+        }
+
         if (!mInterrupted && mProfile.getPostScript() != null) {
             mLog.out("Run POST execution script");
             executeScript(mProfile.getPostScript());
@@ -64,6 +82,35 @@ public class Operation {
         } else {
             mLog.out("\nOperation completed");
         }
+    }
+
+    private void createPackage(String target) throws IOException {
+        mLog.out("create package: " + target);
+
+        File targetDir = new File(mProfile.getDestDir(), target);
+
+        mLog.out("copy zip contents to: " + targetDir.getAbsolutePath());
+        if (!mDryRun) {
+            targetDir.mkdirs();
+            FileUtils.copyDirectory(mTempDir, targetDir, true);
+        }
+
+        if (mProfile.getResources() != null) {
+            mLog.out("copy resources to: " + targetDir.getAbsolutePath());
+            if (!mDryRun) {
+                FileUtils.copyDirectory(mProfile.getResources(), targetDir, true);
+            }
+        }
+
+        //TODO Add JRE
+        File targetFile = new File(mProfile.getDestDir(), String.format("%s-%s.zip", mProfile.getBasename(), target));
+        mLog.out("creating zip: " + targetFile.getAbsolutePath());
+        if (!mDryRun) {
+            ZipParameters zipParameters = new ZipParameters();
+            zipParameters.setIncludeRootFolder(false);
+            new ZipFile(targetFile.getAbsolutePath()).addFolder(targetDir, zipParameters);
+        }
+        //TODO Add checksums
     }
 
     private void execute(ArrayList<String> command) {
