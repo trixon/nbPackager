@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import org.apache.commons.lang3.SystemUtils;
 import se.trixon.almond.util.Dict;
 import static se.trixon.nbpackager_core.Options.*;
 
@@ -35,6 +36,7 @@ public class ProfilePanel extends javax.swing.JPanel {
      */
     public ProfilePanel() {
         initComponents();
+        init();
     }
 
     void loadProfile(String name) {
@@ -49,10 +51,11 @@ public class ProfilePanel extends javax.swing.JPanel {
         linuxFileChooserPanel.setPath(p.get(KEY_PROFILE_JRE_LINUX, ""));
         macFileChooserPanel.setPath(p.get(KEY_PROFILE_JRE_MAC, ""));
         windowsFileChooserPanel.setPath(p.get(KEY_PROFILE_JRE_WINDOWS, ""));
-        appCheckBox.setSelected(p.getBoolean(KEY_PROFILE_DEST_TYPE_APP_IMAGE, false));
-        linuxCheckBox.setSelected(p.getBoolean(KEY_PROFILE_DEST_TYPE_LINUX, false));
-        macCheckBox.setSelected(p.getBoolean(KEY_PROFILE_DEST_TYPE_MAC, false));
-        windowsCheckBox.setSelected(p.getBoolean(KEY_PROFILE_DEST_TYPE_WINDOWS, false));
+        appCheckBox.setSelected(p.getBoolean(KEY_PROFILE_TARGET_APP_IMAGE, false));
+        linuxCheckBox.setSelected(p.getBoolean(KEY_PROFILE_TARGET_LINUX, false));
+        macCheckBox.setSelected(p.getBoolean(KEY_PROFILE_TARGET_MAC, false));
+        windowsCheckBox.setSelected(p.getBoolean(KEY_PROFILE_TARGET_WINDOWS, false));
+        anyCheckBox.setSelected(p.getBoolean(KEY_PROFILE_TARGET_ANY, false));
         sha256CheckBox.setSelected(p.getBoolean(KEY_PROFILE_CHECKSUM_SHA256, false));
         sha512CheckBox.setSelected(p.getBoolean(KEY_PROFILE_CHECKSUM_SHA512, false));
     }
@@ -78,10 +81,11 @@ public class ProfilePanel extends javax.swing.JPanel {
         p.put(KEY_PROFILE_JRE_LINUX, linuxFileChooserPanel.getPath());
         p.put(KEY_PROFILE_JRE_MAC, macFileChooserPanel.getPath());
         p.put(KEY_PROFILE_JRE_WINDOWS, windowsFileChooserPanel.getPath());
-        p.putBoolean(KEY_PROFILE_DEST_TYPE_APP_IMAGE, appCheckBox.isSelected());
-        p.putBoolean(KEY_PROFILE_DEST_TYPE_LINUX, linuxCheckBox.isSelected());
-        p.putBoolean(KEY_PROFILE_DEST_TYPE_MAC, macCheckBox.isSelected());
-        p.putBoolean(KEY_PROFILE_DEST_TYPE_WINDOWS, windowsCheckBox.isSelected());
+        p.putBoolean(KEY_PROFILE_TARGET_APP_IMAGE, appCheckBox.isSelected());
+        p.putBoolean(KEY_PROFILE_TARGET_LINUX, linuxCheckBox.isSelected());
+        p.putBoolean(KEY_PROFILE_TARGET_MAC, macCheckBox.isSelected());
+        p.putBoolean(KEY_PROFILE_TARGET_WINDOWS, windowsCheckBox.isSelected());
+        p.putBoolean(KEY_PROFILE_TARGET_ANY, anyCheckBox.isSelected());
         p.putBoolean(KEY_PROFILE_CHECKSUM_SHA256, sha256CheckBox.isSelected());
         p.putBoolean(KEY_PROFILE_CHECKSUM_SHA512, sha512CheckBox.isSelected());
 
@@ -100,11 +104,17 @@ public class ProfilePanel extends javax.swing.JPanel {
         profile.setTargetLinux(linuxCheckBox.isSelected());
         profile.setTargetMac(macCheckBox.isSelected());
         profile.setTargetWindows(windowsCheckBox.isSelected());
+        profile.setTargetAny(anyCheckBox.isSelected());
 
         profile.setChecksumSha256(sha256CheckBox.isSelected());
         profile.setChecksumSha512(sha512CheckBox.isSelected());
 
         return profile;
+    }
+
+    private void init() {
+        appImageTemplateFileChooserPanel.setEnabled(SystemUtils.IS_OS_LINUX);
+        appCheckBox.setEnabled(SystemUtils.IS_OS_LINUX);
     }
 
     /**
@@ -131,6 +141,7 @@ public class ProfilePanel extends javax.swing.JPanel {
         linuxCheckBox = new javax.swing.JCheckBox();
         macCheckBox = new javax.swing.JCheckBox();
         windowsCheckBox = new javax.swing.JCheckBox();
+        anyCheckBox = new javax.swing.JCheckBox();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(64, 0), new java.awt.Dimension(64, 0), new java.awt.Dimension(64, 32767));
         sha512CheckBox = new javax.swing.JCheckBox();
         sha256CheckBox = new javax.swing.JCheckBox();
@@ -201,6 +212,9 @@ public class ProfilePanel extends javax.swing.JPanel {
 
         windowsCheckBox.setText("Windows");
         destPanel.add(windowsCheckBox);
+
+        anyCheckBox.setText("Any");
+        destPanel.add(anyCheckBox);
         destPanel.add(filler1);
 
         sha512CheckBox.setText("sha512sum");
@@ -217,6 +231,7 @@ public class ProfilePanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox anyCheckBox;
     private javax.swing.JCheckBox appCheckBox;
     private se.trixon.almond.util.swing.dialogs.FileChooserPanel appImageTemplateFileChooserPanel;
     private se.trixon.almond.util.swing.dialogs.FileChooserPanel destFileChooserPanel;

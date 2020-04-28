@@ -135,6 +135,11 @@
             <Property name="text" type="java.lang.String" value="Windows"/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JCheckBox" name="anyCheckBox">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Any"/>
+          </Properties>
+        </Component>
         <Component class="javax.swing.Box$Filler" name="filler1">
           <Properties>
             <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">

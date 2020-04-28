@@ -37,6 +37,7 @@ public class Profile {
     private File mPreScript;
     private File mResources;
     private File mSource;
+    private boolean mTargetAny;
     private boolean mTargetAppImage;
     private boolean mTargetLinux;
     private boolean mTargetMac;
@@ -88,6 +89,10 @@ public class Profile {
 
     public boolean isChecksumSha512() {
         return mChecksumSha512;
+    }
+
+    public boolean isTargetAny() {
+        return mTargetAny;
     }
 
     public boolean isTargetAppImage() {
@@ -148,6 +153,10 @@ public class Profile {
 
     public void setSource(File source) {
         mSource = source;
+    }
+
+    public void setTargetAny(boolean targetAny) {
+        mTargetAny = targetAny;
     }
 
     public void setTargetAppImage(boolean targetAppImage) {
@@ -230,7 +239,7 @@ public class Profile {
             addValidationError("invalid target: Windows");
         }
 
-        if (mTargetAppImage || mTargetLinux || mTargetMac || mTargetWindows == false) {
+        if ((mTargetAppImage || mTargetLinux || mTargetMac || mTargetWindows || mTargetAny) == false) {
             addValidationError("invalid target: NO TARGET SELECTED");
         }
 
@@ -257,15 +266,22 @@ public class Profile {
         values.put("POST execution", fileToString(mPostScript));
         values.put("Resources", fileToString(mResources));
         values.put("AppImage template", fileToString(mAppImageTemplate));
-        values.put("JRE Linux", fileToString(mJreLinux));
-        values.put("JRE Mac", fileToString(mJreMac));
-        values.put("JRE Windows", fileToString(mJreWindows));
-        values.put("Target AppImage", BooleanHelper.asYesNo(mTargetAppImage));
-        values.put("Target Linux", BooleanHelper.asYesNo(mTargetLinux));
-        values.put("Target Mac", BooleanHelper.asYesNo(mTargetMac));
-        values.put("Target Windows", BooleanHelper.asYesNo(mTargetWindows));
-        values.put("Checksum sha256", BooleanHelper.asYesNo(mChecksumSha256));
-        values.put("Checksum sha512", BooleanHelper.asYesNo(mChecksumSha512));
+        values.put(" ", "");
+        values.put("JRE", "");
+        values.put(" Linux", fileToString(mJreLinux));
+        values.put(" Mac", fileToString(mJreMac));
+        values.put(" Windows", fileToString(mJreWindows));
+        values.put("  ", "");
+        values.put("Target  ", "");
+        values.put(" AppImage", BooleanHelper.asYesNo(mTargetAppImage));
+        values.put(" Linux ", BooleanHelper.asYesNo(mTargetLinux));
+        values.put(" Mac ", BooleanHelper.asYesNo(mTargetMac));
+        values.put(" Windows ", BooleanHelper.asYesNo(mTargetWindows));
+        values.put(" Any", BooleanHelper.asYesNo(mTargetAny));
+        values.put("   ", "");
+        values.put("Checksum", "");
+        values.put(" sha256", BooleanHelper.asYesNo(mChecksumSha256));
+        values.put(" sha512", BooleanHelper.asYesNo(mChecksumSha512));
 
         int maxLength = Integer.MIN_VALUE;
         for (var key : values.keySet()) {

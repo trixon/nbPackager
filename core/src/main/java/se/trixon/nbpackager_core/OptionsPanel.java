@@ -19,6 +19,7 @@ import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JButton;
 import javax.swing.event.DocumentListener;
+import org.apache.commons.lang3.SystemUtils;
 import se.trixon.almond.util.GraphicsHelper;
 import se.trixon.almond.util.icons.material.swing.MaterialIcon;
 import se.trixon.almond.util.swing.dialogs.FileChooserPanel;
@@ -38,6 +39,9 @@ public class OptionsPanel extends javax.swing.JPanel {
     public OptionsPanel() {
         MaterialIcon.setDefaultColor(GraphicsHelper.getBrightness(new JButton().getBackground()) < 128 ? Color.WHITE : Color.BLACK);
         initComponents();
+        appImageFileChooserPanel.setEnabled(SystemUtils.IS_OS_LINUX);
+        appimagetoolOptionsTextField.setEnabled(SystemUtils.IS_OS_LINUX);
+
     }
 
     public void load() {
@@ -66,12 +70,12 @@ public class OptionsPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         appImageFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
-        appimagetoolOptionsjLabel = new javax.swing.JLabel();
+        appimagetoolOptionsLabel = new javax.swing.JLabel();
         appimagetoolOptionsTextField = new javax.swing.JTextField();
 
         appImageFileChooserPanel.setHeader("AppImageTool");
 
-        appimagetoolOptionsjLabel.setText("AppImageTool options");
+        appimagetoolOptionsLabel.setText("AppImageTool options");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -82,7 +86,7 @@ public class OptionsPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(appImageFileChooserPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(appimagetoolOptionsjLabel)
+                        .addComponent(appimagetoolOptionsLabel)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(appimagetoolOptionsTextField))
                 .addContainerGap())
@@ -93,7 +97,7 @@ public class OptionsPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(appImageFileChooserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(appimagetoolOptionsjLabel)
+                .addComponent(appimagetoolOptionsLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(appimagetoolOptionsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(179, Short.MAX_VALUE))
@@ -102,7 +106,7 @@ public class OptionsPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private se.trixon.almond.util.swing.dialogs.FileChooserPanel appImageFileChooserPanel;
+    private javax.swing.JLabel appimagetoolOptionsLabel;
     private javax.swing.JTextField appimagetoolOptionsTextField;
-    private javax.swing.JLabel appimagetoolOptionsjLabel;
     // End of variables declaration//GEN-END:variables
 }

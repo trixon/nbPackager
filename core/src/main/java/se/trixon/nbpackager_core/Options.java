@@ -28,10 +28,6 @@ public class Options extends OptionsBase {
     public static final String KEY_PROFILE_CHECKSUM_SHA256 = "checksum.sha256";
     public static final String KEY_PROFILE_CHECKSUM_SHA512 = "checksum.sha512";
     public static final String KEY_PROFILE_DEST_DIR = "dest";
-    public static final String KEY_PROFILE_DEST_TYPE_APP_IMAGE = "dest_type.appimae";
-    public static final String KEY_PROFILE_DEST_TYPE_LINUX = "dest_type.linux";
-    public static final String KEY_PROFILE_DEST_TYPE_MAC = "dest_type.mac";
-    public static final String KEY_PROFILE_DEST_TYPE_WINDOWS = "dest_type.windows";
     public static final String KEY_PROFILE_JRE_LINUX = "jre.linux";
     public static final String KEY_PROFILE_JRE_MAC = "jre.mac";
     public static final String KEY_PROFILE_JRE_WINDOWS = "jre.windows";
@@ -39,6 +35,11 @@ public class Options extends OptionsBase {
     public static final String KEY_PROFILE_SCRIPT_POST = "script.post";
     public static final String KEY_PROFILE_SCRIPT_PRE = "script.pre";
     public static final String KEY_PROFILE_SOURCE_DIR = "source";
+    public static final String KEY_PROFILE_TARGET_ANY = "target.any";
+    public static final String KEY_PROFILE_TARGET_APP_IMAGE = "target.appimae";
+    public static final String KEY_PROFILE_TARGET_LINUX = "target.linux";
+    public static final String KEY_PROFILE_TARGET_MAC = "target.mac";
+    public static final String KEY_PROFILE_TARGET_WINDOWS = "target.windows";
     public static final String OPT_APP_IMAGE_OPTIONS = "appImage.options";
     public static final String OPT_APP_IMAGE_TOOL = "appImage.tool";
 
