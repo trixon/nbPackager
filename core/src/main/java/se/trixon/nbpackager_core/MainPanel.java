@@ -18,6 +18,7 @@ package se.trixon.nbpackager_core;
 import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -276,7 +277,11 @@ public class MainPanel extends javax.swing.JPanel {
             setRunState(RunState.CANCELABLE);
             mOperationThread = new Thread(() -> {
                 Operation operation = new Operation(profile, mLog);
-                operation.start();
+                try {
+                    operation.start();
+                } catch (IOException ex) {
+                    mLog.out(ex.getMessage());
+                }
                 setRunState(RunState.STARTABLE);
                 progressBar.setValue(100);
             });

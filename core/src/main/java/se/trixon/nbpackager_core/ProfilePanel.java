@@ -90,8 +90,8 @@ public class ProfilePanel extends javax.swing.JPanel {
         p.putBoolean(KEY_PROFILE_CHECKSUM_SHA512, sha512CheckBox.isSelected());
 
         Profile profile = new Profile();
-        profile.setSource(sourceFileChooserPanel.getFile());
-        profile.setDest(destFileChooserPanel.getFile());
+        profile.setSourceDir(sourceFileChooserPanel.getFile());
+        profile.setDestDir(destFileChooserPanel.getFile());
         profile.setPreScript(preScriptFileChooserPanel.getFile());
         profile.setPostScript(postScriptFileChooserPanel.getFile());
         profile.setResources(resourcesFileChooserPanel.getFile());

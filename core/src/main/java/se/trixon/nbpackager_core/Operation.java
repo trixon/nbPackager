@@ -17,7 +17,9 @@ package se.trixon.nbpackager_core;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import net.lingala.zip4j.ZipFile;
 import se.trixon.almond.util.Log;
 import se.trixon.almond.util.ProcessLogThread;
 
@@ -28,21 +30,28 @@ import se.trixon.almond.util.ProcessLogThread;
 public class Operation {
 
     private Process mCurrentProcess;
+    private final boolean mDryRun;
     private boolean mInterrupted;
     private final Log mLog;
     private final Profile mProfile;
+    private File mTempDir;
 
     public Operation(Profile profile, Log log) {
         mProfile = profile;
         mLog = log;
+        mDryRun = mProfile.isDryRun();
     }
 
-    public void start() {
+    public void start() throws IOException {
         long startTime = System.currentTimeMillis();
 
         if (mProfile.getPreScript() != null) {
             mLog.out("Run PRE execution script");
             executeScript(mProfile.getPreScript());
+        }
+
+        if (!mInterrupted) {
+            unzip();
         }
 
         if (!mInterrupted && mProfile.getPostScript() != null) {
@@ -60,7 +69,7 @@ public class Operation {
     private void execute(ArrayList<String> command) {
         mLog.out(getHeader() + String.join(" ", command));
 
-        if (!mProfile.isDryRun()) {
+        if (!mDryRun) {
             ProcessBuilder processBuilder = new ProcessBuilder(command).inheritIO();
             processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);
             try {
@@ -85,6 +94,16 @@ public class Operation {
     }
 
     private String getHeader() {
-        return mProfile.isDryRun() ? "execute: (dry-run) " : "execute: ";
+        return mDryRun ? "execute: (dry-run) " : "execute: ";
+    }
+
+    private void unzip() throws IOException {
+        mTempDir = Files.createTempDirectory("packager").toFile();
+        mTempDir.deleteOnExit();
+        mLog.out("create temp dir: " + mTempDir.getAbsolutePath());
+        mLog.out("unzip: " + mProfile.getSourceFile());
+        if (!mDryRun) {
+            new ZipFile(mProfile.getSourceFile()).extractAll(mTempDir.getAbsolutePath());
+        }
     }
 }
