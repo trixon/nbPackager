@@ -17,11 +17,16 @@ package se.trixon.nbpackager_core;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Locale;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.codec.digest.MessageDigestAlgorithms;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import se.trixon.almond.util.Log;
 import se.trixon.almond.util.ProcessLogThread;
 
@@ -84,6 +89,15 @@ public class Operation {
         }
     }
 
+    private void createChecksum(File file, String algorithm) throws IOException {
+        File digestFile = new File(file.getAbsolutePath() + String.format(".%s", StringUtils.remove(algorithm, "-").toLowerCase(Locale.getDefault())));
+        mLog.out("create checksum: " + digestFile.getAbsolutePath());
+        if (!mDryRun) {
+            String digest = new DigestUtils(algorithm).digestAsHex(file);
+            FileUtils.writeStringToFile(digestFile, String.format("%s  %s", digest, file.getName()), Charset.defaultCharset());
+        }
+    }
+
     private void createPackage(String target) throws IOException {
         mLog.out("create package: " + target);
 
@@ -110,7 +124,14 @@ public class Operation {
             zipParameters.setIncludeRootFolder(false);
             new ZipFile(targetFile.getAbsolutePath()).addFolder(targetDir, zipParameters);
         }
-        //TODO Add checksums
+
+        if (mProfile.isChecksumSha256()) {
+            createChecksum(targetFile, MessageDigestAlgorithms.SHA_256);
+        }
+
+        if (mProfile.isChecksumSha512()) {
+            createChecksum(targetFile, MessageDigestAlgorithms.SHA_512);
+        }
     }
 
     private void execute(ArrayList<String> command) {
