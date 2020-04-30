@@ -15,6 +15,7 @@
  */
 package se.trixon.nbpackager;
 
+import javax.swing.JOptionPane;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -23,6 +24,8 @@ import org.openide.util.NbPreferences;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 import org.openide.windows.TopComponent;
+import se.trixon.nbpackager_core.DialogListener;
+import se.trixon.nbpackager_core.MainPanel;
 import se.trixon.nbpackager_core.Options;
 
 /**
@@ -79,6 +82,12 @@ public final class PackagerTopComponent extends TopComponent {
 
         mainPanel.init();
         mainPanel.getHelpButton().setVisible(true);
+        MainPanel.setDialogListener(new DialogListener() {
+            @Override
+            public boolean onDialogRequest(String title, String message) {
+                return JOptionPane.showConfirmDialog(PackagerTopComponent.this, message, title, JOptionPane.YES_NO_OPTION) == JOptionPane.OK_OPTION;
+            }
+        });
     }
 
     /**

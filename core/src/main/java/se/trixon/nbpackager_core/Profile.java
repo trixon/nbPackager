@@ -143,7 +143,7 @@ public class Profile {
             addValidationError("no zip found in " + mSourceDir);
         }
 
-        if (mDestDir == null || mDestDir.exists()) {
+        if (mDestDir == null || !mDestDir.isDirectory()) {
             addValidationError("invalid destination directory: " + mDestDir);
         }
 

@@ -26,6 +26,7 @@ import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.codec.digest.MessageDigestAlgorithms;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import se.trixon.almond.util.Log;
 import se.trixon.almond.util.ProcessLogThread;
@@ -36,7 +37,9 @@ import se.trixon.almond.util.ProcessLogThread;
  */
 public class Operation {
 
+    private String mContentDir = "NOT_AVAILABLE_IN_DRY_RUN";
     private Process mCurrentProcess;
+    private File mDestDir;
     private final boolean mDryRun;
     private boolean mInterrupted;
     private final Log mLog;
@@ -51,6 +54,13 @@ public class Operation {
 
     public void start() throws IOException {
         long startTime = System.currentTimeMillis();
+
+        if (!mDryRun) {
+            if (!initTargetDirectory()) {
+                mLog.err("\nOperation cancelled");
+                return;
+            }
+        }
 
         if (mProfile.getPreScript() != null) {
             mLog.out("Run PRE execution script");
@@ -82,10 +92,20 @@ public class Operation {
             executeScript(mProfile.getPostScript());
         }
 
+        FileUtils.deleteDirectory(mTempDir);
+
         if (mInterrupted) {
             mLog.err("\nOperation interrupted");
         } else {
             mLog.out("\nOperation completed");
+        }
+    }
+
+    private void copyJre(File jreDir, File targetDir) throws IOException {
+        File destDir = new File(targetDir, jreDir.getName());
+        mLog.out("copy jre to: " + destDir.getAbsolutePath());
+        if (!mDryRun) {
+            FileUtils.copyDirectory(jreDir, destDir, true);
         }
     }
 
@@ -99,9 +119,10 @@ public class Operation {
     }
 
     private void createPackage(String target) throws IOException {
-        mLog.out("create package: " + target);
+        mLog.out("\ncreate package: " + target);
 
-        File targetDir = new File(mProfile.getDestDir(), target);
+//        File artifactDir = new File(mDestDir, mContentDir);
+        File targetDir = new File(mDestDir, target);
 
         mLog.out("copy zip contents to: " + targetDir.getAbsolutePath());
         if (!mDryRun) {
@@ -109,6 +130,7 @@ public class Operation {
             FileUtils.copyDirectory(mTempDir, targetDir, true);
         }
 
+        targetDir = new File(targetDir, mContentDir);
         if (mProfile.getResources() != null) {
             mLog.out("copy resources to: " + targetDir.getAbsolutePath());
             if (!mDryRun) {
@@ -116,12 +138,20 @@ public class Operation {
             }
         }
 
-        //TODO Add JRE
-        File targetFile = new File(mProfile.getDestDir(), String.format("%s-%s.zip", mProfile.getBasename(), target));
+        if (target.equalsIgnoreCase("linux") && mProfile.isTargetLinux()) {
+            copyJre(mProfile.getJreLinux(), targetDir);
+        } else if (target.equalsIgnoreCase("mac") && mProfile.isTargetMac()) {
+            copyJre(mProfile.getJreMac(), targetDir);
+        } else if (target.equalsIgnoreCase("windows") && mProfile.isTargetWindows()) {
+            copyJre(mProfile.getJreWindows(), targetDir);
+        }
+
+        File targetFile = new File(mDestDir, String.format("%s-%s.zip", mProfile.getBasename(), target));
         mLog.out("creating zip: " + targetFile.getAbsolutePath());
         if (!mDryRun) {
+            FileUtils.deleteQuietly(targetFile);
             ZipParameters zipParameters = new ZipParameters();
-            zipParameters.setIncludeRootFolder(false);
+            zipParameters.setIncludeRootFolder(true);
             new ZipFile(targetFile.getAbsolutePath()).addFolder(targetDir, zipParameters);
         }
 
@@ -165,6 +195,24 @@ public class Operation {
         return mDryRun ? "execute: (dry-run) " : "execute: ";
     }
 
+    private boolean initTargetDirectory() throws IOException {
+        String name = FilenameUtils.getBaseName(mProfile.getSourceFile().getName());
+        mDestDir = new File(mProfile.getDestDir(), name);
+        boolean result = true;
+
+        if (!mDestDir.exists()) {
+            FileUtils.forceMkdir(mDestDir);
+        } else {
+            result = MainPanel.getDialogListener().onDialogRequest("Clear existing object?", String.format("Clear\n%s\nand continue?", mDestDir.getAbsolutePath()));
+            if (result) {
+                FileUtils.deleteQuietly(mDestDir);
+                FileUtils.forceMkdir(mDestDir);
+            }
+        }
+
+        return result;
+    }
+
     private void unzip() throws IOException {
         mTempDir = Files.createTempDirectory("packager").toFile();
         mTempDir.deleteOnExit();
@@ -172,6 +220,7 @@ public class Operation {
         mLog.out("unzip: " + mProfile.getSourceFile());
         if (!mDryRun) {
             new ZipFile(mProfile.getSourceFile()).extractAll(mTempDir.getAbsolutePath());
+            mContentDir = mTempDir.list()[0];
         }
     }
 }

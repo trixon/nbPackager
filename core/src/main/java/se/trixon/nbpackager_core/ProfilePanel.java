@@ -143,8 +143,8 @@ public class ProfilePanel extends javax.swing.JPanel {
         windowsCheckBox = new javax.swing.JCheckBox();
         anyCheckBox = new javax.swing.JCheckBox();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(64, 0), new java.awt.Dimension(64, 0), new java.awt.Dimension(64, 32767));
-        sha512CheckBox = new javax.swing.JCheckBox();
         sha256CheckBox = new javax.swing.JCheckBox();
+        sha512CheckBox = new javax.swing.JCheckBox();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -217,11 +217,11 @@ public class ProfilePanel extends javax.swing.JPanel {
         destPanel.add(anyCheckBox);
         destPanel.add(filler1);
 
-        sha512CheckBox.setText("sha512sum");
-        destPanel.add(sha512CheckBox);
-
         sha256CheckBox.setText("sha256sum");
         destPanel.add(sha256CheckBox);
+
+        sha512CheckBox.setText("sha512sum");
+        destPanel.add(sha512CheckBox);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 2;

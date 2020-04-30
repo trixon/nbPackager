@@ -156,14 +156,14 @@
             <AuxValue name="classDetails" type="java.lang.String" value="Box.Filler.HorizontalStrut"/>
           </AuxValues>
         </Component>
-        <Component class="javax.swing.JCheckBox" name="sha512CheckBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="sha512sum"/>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JCheckBox" name="sha256CheckBox">
           <Properties>
             <Property name="text" type="java.lang.String" value="sha256sum"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="sha512CheckBox">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="sha512sum"/>
           </Properties>
         </Component>
       </SubComponents>

@@ -19,7 +19,6 @@ import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,6 +42,15 @@ public class MainPanel extends javax.swing.JPanel {
     private final Options mOptions = Options.getInstance();
     private static final int ICON_SIZE = 24;
     private Thread mOperationThread;
+    private static DialogListener sDialogListener;
+
+    public static DialogListener getDialogListener() {
+        return sDialogListener;
+    }
+
+    public static void setDialogListener(DialogListener dialogListener) {
+        MainPanel.sDialogListener = dialogListener;
+    }
 
     /**
      * Creates new form MainPanel
@@ -270,7 +278,7 @@ public class MainPanel extends javax.swing.JPanel {
     private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
         Profile profile = profilePanel.saveProfile(getProfileName());
         profile.setDryRun(dryRunCheckBox.isSelected());
-        mLog.timedOut(LocalDateTime.now().toString() + " validating settings");
+        mLog.timedOut("Validating settings");
 
         if (profile.isValid()) {
             mLog.timedOut(profile.toDebugString());

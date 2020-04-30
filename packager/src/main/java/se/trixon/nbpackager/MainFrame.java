@@ -30,6 +30,8 @@ import se.trixon.almond.util.SystemHelper;
 import se.trixon.almond.util.swing.AboutModel;
 import se.trixon.almond.util.swing.SwingHelper;
 import se.trixon.almond.util.swing.dialogs.about.AboutPanel;
+import se.trixon.nbpackager_core.DialogListener;
+import se.trixon.nbpackager_core.MainPanel;
 import se.trixon.nbpackager_core.Options;
 import se.trixon.nbpackager_core.OptionsPanel;
 
@@ -203,6 +205,12 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         mainPanel.init();
+        MainPanel.setDialogListener(new DialogListener() {
+            @Override
+            public boolean onDialogRequest(String title, String message) {
+                return JOptionPane.showConfirmDialog(MainFrame.this, message, title, JOptionPane.YES_NO_OPTION) == JOptionPane.OK_OPTION;
+            }
+        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
