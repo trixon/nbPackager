@@ -102,9 +102,14 @@ public class Operation {
     }
 
     private void copyJre(File jreDir, File targetDir) throws IOException {
-        File destDir = new File(targetDir, jreDir.getName());
+        String etc = String.format("etc/%s.conf", targetDir.getName());
+        String jreName = jreDir.getName();
+        File destDir = new File(targetDir, jreName);
+        File etcFile = new File(targetDir, etc);
+        mLog.out("set jdkhome in " + etcFile.getAbsolutePath());
         mLog.out("copy jre to: " + destDir.getAbsolutePath());
         if (!mDryRun) {
+            FileUtils.write(etcFile, String.format("\n\n# Added by Packager\njdkhome=\"%s\"\n", jreName), "utf-8", true);
             FileUtils.copyDirectory(jreDir, destDir, true);
         }
     }
