@@ -20,7 +20,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -30,6 +32,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import se.trixon.almond.util.Log;
 import se.trixon.almond.util.ProcessLogThread;
+import static se.trixon.nbpackager_core.Options.*;
 
 /**
  *
@@ -43,6 +46,7 @@ public class Operation {
     private final boolean mDryRun;
     private boolean mInterrupted;
     private final Log mLog;
+    private final Options mOptions = Options.getInstance();
     private final Profile mProfile;
     private File mTempDir;
 
@@ -87,6 +91,10 @@ public class Operation {
             createPackage("windows");
         }
 
+        if (!mInterrupted & mProfile.isTargetAppImage()) {
+            createPackageAppImage();
+        }
+
         if (!mInterrupted && mProfile.getPostScript() != null) {
             mLog.out("Run POST execution script");
             executeScript(mProfile.getPostScript());
@@ -102,7 +110,7 @@ public class Operation {
     }
 
     private void copyJre(File jreDir, File targetDir) throws IOException {
-        String etc = String.format("etc/%s.conf", targetDir.getName());
+        String etc = String.format("etc/%s.conf", mContentDir);
         String jreName = jreDir.getName();
         File destDir = new File(targetDir, jreName);
         File etcFile = new File(targetDir, etc);
@@ -123,10 +131,19 @@ public class Operation {
         }
     }
 
+    private void createChecksums(File file) throws IOException {
+        if (mProfile.isChecksumSha256()) {
+            createChecksum(file, MessageDigestAlgorithms.SHA_256);
+        }
+
+        if (mProfile.isChecksumSha512()) {
+            createChecksum(file, MessageDigestAlgorithms.SHA_512);
+        }
+    }
+
     private void createPackage(String target) throws IOException {
         mLog.out("\ncreate package: " + target);
 
-//        File artifactDir = new File(mDestDir, mContentDir);
         File targetDir = new File(mDestDir, target);
 
         mLog.out("copy zip contents to: " + targetDir.getAbsolutePath());
@@ -143,12 +160,18 @@ public class Operation {
             }
         }
 
+        boolean keepWindows = false;
         if (target.equalsIgnoreCase("linux") && mProfile.isTargetLinux()) {
             copyJre(mProfile.getJreLinux(), targetDir);
         } else if (target.equalsIgnoreCase("mac") && mProfile.isTargetMac()) {
             copyJre(mProfile.getJreMac(), targetDir);
         } else if (target.equalsIgnoreCase("windows") && mProfile.isTargetWindows()) {
             copyJre(mProfile.getJreWindows(), targetDir);
+            keepWindows = true;
+        }
+
+        if (!target.equalsIgnoreCase("any")) {
+            removeBin(new File(targetDir, "bin"), keepWindows);
         }
 
         File targetFile = new File(mDestDir, String.format("%s-%s.zip", mProfile.getBasename(), target));
@@ -160,21 +183,60 @@ public class Operation {
             new ZipFile(targetFile.getAbsolutePath()).addFolder(targetDir, zipParameters);
         }
 
-        if (mProfile.isChecksumSha256()) {
-            createChecksum(targetFile, MessageDigestAlgorithms.SHA_256);
-        }
-
-        if (mProfile.isChecksumSha512()) {
-            createChecksum(targetFile, MessageDigestAlgorithms.SHA_512);
-        }
+        createChecksums(targetFile);
     }
 
-    private void execute(ArrayList<String> command) {
+    private void createPackageAppImage() throws IOException {
+        mLog.out("\ncreate package: AppImage");
+        mLog.out("copy template to: " + mDestDir.getAbsolutePath());
+        String templateName = mProfile.getAppImageTemplate().getName();
+        File targetDir = new File(mDestDir, templateName);
+        File targetFile = new File(mDestDir, StringUtils.replace(templateName, "AppDir", "AppImage"));
+
+        if (!mDryRun) {
+            FileUtils.copyDirectory(mProfile.getAppImageTemplate(), targetDir, true);
+        }
+
+        File usrDir = new File(targetDir, "usr");
+        mLog.out("copy zip contents to: " + usrDir.getAbsolutePath());
+        if (!mDryRun) {
+            for (File file : new File(mTempDir, mContentDir).listFiles()) {
+                if (file.isFile()) {
+                    FileUtils.copyFileToDirectory(file, usrDir, true);
+                } else {
+                    FileUtils.copyDirectoryToDirectory(file, usrDir);
+                }
+            }
+        }
+
+        removeBin(new File(usrDir, "bin"), false);
+        copyJre(mProfile.getJreLinux(), usrDir);
+
+        HashMap<String, String> environment = new HashMap<>();
+        environment.put("ARCH", "x86_64");
+        ArrayList<String> command = new ArrayList<>();
+        command.add(mOptions.get(OPT_APP_IMAGE_TOOL, "NO_COMMAND_SPECIFIED"));
+        for (String option : StringUtils.split(mOptions.get(OPT_APP_IMAGE_OPTIONS, ""))) {
+            command.add(option);
+        }
+
+        command.add(targetDir.getAbsolutePath());
+        command.add(targetFile.getAbsolutePath());
+        execute(command, environment);
+
+        createChecksums(targetFile);
+    }
+
+    private void execute(ArrayList<String> command, Map<String, String> environment) {
         mLog.out(getHeader() + String.join(" ", command));
 
         if (!mDryRun) {
             ProcessBuilder processBuilder = new ProcessBuilder(command).inheritIO();
             processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);
+            if (environment != null) {
+                processBuilder.environment().putAll(environment);
+            }
+
             try {
                 mCurrentProcess = processBuilder.start();
                 new ProcessLogThread(mCurrentProcess.getInputStream(), 0, mLog).start();
@@ -193,7 +255,7 @@ public class Operation {
     private void executeScript(File script) {
         ArrayList<String> command = new ArrayList<>();
         command.add(script.getAbsolutePath());
-        execute(command);
+        execute(command, null);
     }
 
     private String getHeader() {
@@ -216,6 +278,22 @@ public class Operation {
         }
 
         return result;
+    }
+
+    private void removeBin(File file) throws IOException {
+        mLog.out("remove: " + file.getAbsolutePath());
+        if (!mDryRun) {
+            FileUtils.forceDelete(file);
+        }
+    }
+
+    private void removeBin(File binDir, boolean keepWindows) throws IOException {
+        if (keepWindows) {
+            removeBin(new File(binDir, mContentDir));
+        } else {
+            removeBin(new File(binDir, String.format("%s.exe", mContentDir)));
+            removeBin(new File(binDir, String.format("%s64.exe", mContentDir)));
+        }
     }
 
     private void unzip() throws IOException {
