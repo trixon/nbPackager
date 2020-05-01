@@ -20,11 +20,11 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.codec.digest.MessageDigestAlgorithms;
 import org.apache.commons.io.FileUtils;
@@ -118,8 +118,17 @@ public class Operation {
         mLog.out("copy jre to: " + destDir.getAbsolutePath());
         if (!mDryRun) {
             FileUtils.write(etcFile, String.format("\n\n# Added by Packager\njdkhome=\"%s\"\n", jreName), "utf-8", true);
-            FileUtils.copyDirectory(jreDir, destDir, true);
+            cp(jreDir, destDir, false);
         }
+    }
+
+    private void cp(File source, File dest, boolean contentOnly) {
+        String sourcePath = source.getAbsolutePath();
+        if (contentOnly && source.isDirectory()) {
+            sourcePath += "/.";
+        }
+        execute(null, null, "cp", "-ra", sourcePath, dest.getAbsolutePath());
+        //FileUtils.copyDirectory(source, dest, true);
     }
 
     private void createChecksum(File file, String algorithm) throws IOException {
@@ -149,14 +158,14 @@ public class Operation {
         mLog.out("copy zip contents to: " + targetDir.getAbsolutePath());
         if (!mDryRun) {
             targetDir.mkdirs();
-            FileUtils.copyDirectory(mTempDir, targetDir, true);
+            cp(mTempDir, targetDir, true);
         }
 
         targetDir = new File(targetDir, mContentDir);
         if (mProfile.getResources() != null) {
             mLog.out("copy resources to: " + targetDir.getAbsolutePath());
             if (!mDryRun) {
-                FileUtils.copyDirectory(mProfile.getResources(), targetDir, true);
+                cp(mProfile.getResources(), targetDir, true);
             }
         }
 
@@ -176,12 +185,7 @@ public class Operation {
 
         File targetFile = new File(mDestDir, String.format("%s-%s.zip", mProfile.getBasename(), target));
         mLog.out("creating zip: " + targetFile.getAbsolutePath());
-        if (!mDryRun) {
-            FileUtils.deleteQuietly(targetFile);
-            ZipParameters zipParameters = new ZipParameters();
-            zipParameters.setIncludeRootFolder(true);
-            new ZipFile(targetFile.getAbsolutePath()).addFolder(targetDir, zipParameters);
-        }
+        execute(null, targetDir.getParentFile(), "zip", "-qr", targetFile.getAbsolutePath(), mContentDir);
 
         createChecksums(targetFile);
     }
@@ -194,19 +198,13 @@ public class Operation {
         File targetFile = new File(mDestDir, StringUtils.replace(templateName, "AppDir", "AppImage"));
 
         if (!mDryRun) {
-            FileUtils.copyDirectory(mProfile.getAppImageTemplate(), targetDir, true);
+            cp(mProfile.getAppImageTemplate(), targetDir, false);
         }
 
         File usrDir = new File(targetDir, "usr");
         mLog.out("copy zip contents to: " + usrDir.getAbsolutePath());
         if (!mDryRun) {
-            for (File file : new File(mTempDir, mContentDir).listFiles()) {
-                if (file.isFile()) {
-                    FileUtils.copyFileToDirectory(file, usrDir, true);
-                } else {
-                    FileUtils.copyDirectoryToDirectory(file, usrDir);
-                }
-            }
+            cp(new File(mTempDir, mContentDir), usrDir, true);
         }
 
         removeBin(new File(usrDir, "bin"), false);
@@ -222,12 +220,16 @@ public class Operation {
 
         command.add(targetDir.getAbsolutePath());
         command.add(targetFile.getAbsolutePath());
-        execute(command, environment);
+        execute(command, environment, null);
 
         createChecksums(targetFile);
     }
 
-    private void execute(ArrayList<String> command, Map<String, String> environment) {
+    private void execute(Map<String, String> environment, File workingDirectory, String... commands) {
+        execute(new ArrayList<>(Arrays.asList(commands)), environment, workingDirectory);
+    }
+
+    private void execute(ArrayList<String> command, Map<String, String> environment, File workingDirectory) {
         mLog.out(getHeader() + String.join(" ", command));
 
         if (!mDryRun) {
@@ -236,7 +238,9 @@ public class Operation {
             if (environment != null) {
                 processBuilder.environment().putAll(environment);
             }
-
+            if (workingDirectory != null) {
+                processBuilder.directory(workingDirectory);
+            }
             try {
                 mCurrentProcess = processBuilder.start();
                 new ProcessLogThread(mCurrentProcess.getInputStream(), 0, mLog).start();
@@ -253,9 +257,7 @@ public class Operation {
     }
 
     private void executeScript(File script) {
-        ArrayList<String> command = new ArrayList<>();
-        command.add(script.getAbsolutePath());
-        execute(command, null);
+        execute(null, null, script.getAbsolutePath());
     }
 
     private String getHeader() {
@@ -288,11 +290,11 @@ public class Operation {
     }
 
     private void removeBin(File binDir, boolean keepWindows) throws IOException {
-        if (keepWindows) {
-            removeBin(new File(binDir, mContentDir));
-        } else {
-            removeBin(new File(binDir, String.format("%s.exe", mContentDir)));
-            removeBin(new File(binDir, String.format("%s64.exe", mContentDir)));
+        for (File file : binDir.listFiles()) {
+            boolean exe = FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("exe");
+            if ((keepWindows && !exe) || (!keepWindows && exe)) {
+                removeBin(file);
+            }
         }
     }
 
@@ -302,6 +304,7 @@ public class Operation {
         mLog.out("create temp dir: " + mTempDir.getAbsolutePath());
         mLog.out("unzip: " + mProfile.getSourceFile());
         if (!mDryRun) {
+            //execute(null, "unzip", "-q", mProfile.getSourceFile().getAbsolutePath(), "-d", mTempDir.getAbsolutePath());
             new ZipFile(mProfile.getSourceFile()).extractAll(mTempDir.getAbsolutePath());
             mContentDir = mTempDir.list()[0];
         }
