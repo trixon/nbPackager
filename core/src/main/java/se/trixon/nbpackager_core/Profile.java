@@ -21,6 +21,8 @@ import java.util.LinkedHashMap;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import se.trixon.almond.util.BooleanHelper;
+import static se.trixon.nbpackager_core.Options.DEFAULT_APP_IMAGE_TOOL;
+import static se.trixon.nbpackager_core.Options.OPT_APP_IMAGE_TOOL;
 
 /**
  *
@@ -48,6 +50,7 @@ public class Profile {
     private boolean mTargetMac;
     private boolean mTargetWindows;
     private StringBuilder mValidationErrorBuilder;
+    private Options mOptions = Options.getInstance();
 
     public Profile() {
     }
@@ -198,6 +201,13 @@ public class Profile {
 
         if ((mTargetAppImage || mTargetLinux || mTargetMac || mTargetWindows || mTargetAny) == false) {
             addValidationError("invalid target: NO TARGET SELECTED");
+        }
+
+        if (mTargetAppImage) {
+            File appImageTool = new File(mOptions.get(OPT_APP_IMAGE_TOOL, DEFAULT_APP_IMAGE_TOOL));
+            if (!appImageTool.isFile()) {
+                addValidationError(String.format("invalid appimagetool: Check your settings (%s)", appImageTool.getAbsolutePath()));
+            }
         }
 
         return mValidationErrorBuilder.length() == 0;

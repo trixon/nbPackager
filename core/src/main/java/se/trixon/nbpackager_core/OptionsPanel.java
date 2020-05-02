@@ -45,8 +45,8 @@ public class OptionsPanel extends javax.swing.JPanel {
     }
 
     public void load() {
-        appImageFileChooserPanel.setPath(mOptions.get(OPT_APP_IMAGE_TOOL, "/path/to/appimagetool-x86_64.AppImage"));
-        appimagetoolOptionsTextField.setText(mOptions.get(OPT_APP_IMAGE_OPTIONS, "-nv"));
+        appImageFileChooserPanel.setPath(mOptions.get(OPT_APP_IMAGE_TOOL, DEFAULT_APP_IMAGE_TOOL));
+        appimagetoolOptionsTextField.setText(mOptions.get(OPT_APP_IMAGE_OPTIONS, DEFAULT_APP_IMAGE_OPTIONS));
     }
 
     public void save() {

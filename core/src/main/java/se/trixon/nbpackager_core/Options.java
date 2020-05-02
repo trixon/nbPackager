@@ -42,6 +42,8 @@ public class Options extends OptionsBase {
     public static final String KEY_PROFILE_TARGET_WINDOWS = "target.windows";
     public static final String OPT_APP_IMAGE_OPTIONS = "appImage.options";
     public static final String OPT_APP_IMAGE_TOOL = "appImage.tool";
+    public static final String DEFAULT_APP_IMAGE_TOOL = "/path/to/appimagetool-x86_64.AppImage";
+    public static final String DEFAULT_APP_IMAGE_OPTIONS = "-nv";
 
     public static Options getInstance() {
         return OptionsHolder.INSTANCE;
