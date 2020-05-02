@@ -57,7 +57,7 @@ public class Operation {
     }
 
     public void start() throws IOException {
-        long startTime = System.currentTimeMillis();
+        mDestDir = new File(mProfile.getDestDir(), FilenameUtils.getBaseName(mProfile.getSourceFile().getName()));
 
         if (!mDryRun) {
             if (!initTargetDirectory()) {
@@ -105,7 +105,7 @@ public class Operation {
         if (mInterrupted) {
             mLog.err("\nOperation interrupted");
         } else {
-            mLog.out("\nOperation completed");
+            mLog.out("\nOperation completed" + (mDryRun ? " (dry-run)" : ""));
         }
     }
 
@@ -213,7 +213,7 @@ public class Operation {
         HashMap<String, String> environment = new HashMap<>();
         environment.put("ARCH", "x86_64");
         ArrayList<String> command = new ArrayList<>();
-        command.add(mOptions.get(OPT_APP_IMAGE_TOOL, "NO_COMMAND_SPECIFIED"));
+        command.add(mOptions.get(OPT_APP_IMAGE_TOOL, "NO_COMMAND_SPECIFIED_CHECK_YOUR_SETTINGS"));
         for (String option : StringUtils.split(mOptions.get(OPT_APP_IMAGE_OPTIONS, ""))) {
             command.add(option);
         }
@@ -265,14 +265,12 @@ public class Operation {
     }
 
     private boolean initTargetDirectory() throws IOException {
-        String name = FilenameUtils.getBaseName(mProfile.getSourceFile().getName());
-        mDestDir = new File(mProfile.getDestDir(), name);
         boolean result = true;
 
         if (!mDestDir.exists()) {
             FileUtils.forceMkdir(mDestDir);
         } else {
-            result = MainPanel.getDialogListener().onDialogRequest("Clear existing object?", String.format("Clear\n%s\nand continue?", mDestDir.getAbsolutePath()));
+            result = MainPanel.getDialogListener().onDialogRequest("Clear existing directory?", String.format("Clear\n%s\nand continue?", mDestDir.getAbsolutePath()));
             if (result) {
                 FileUtils.deleteQuietly(mDestDir);
                 FileUtils.forceMkdir(mDestDir);
@@ -290,10 +288,14 @@ public class Operation {
     }
 
     private void removeBin(File binDir, boolean keepWindows) throws IOException {
-        for (File file : binDir.listFiles()) {
-            boolean exe = FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("exe");
-            if ((keepWindows && !exe) || (!keepWindows && exe)) {
-                removeBin(file);
+        if (mDryRun) {
+            mLog.out("remove non platform executable(s)");
+        } else {
+            for (File file : binDir.listFiles()) {
+                boolean exe = FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("exe");
+                if ((keepWindows && !exe) || (!keepWindows && exe)) {
+                    removeBin(file);
+                }
             }
         }
     }
