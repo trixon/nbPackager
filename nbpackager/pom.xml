@@ -29,7 +29,7 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <dependencies>
         <!--NetBeans-->
         <dependency>
@@ -119,11 +119,6 @@
                     <artifactId>commons-text</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-netbeans-modules-options-api</artifactId>
-            <version>${netbeans.version}</version>
         </dependency>
     </dependencies>
     <properties>
