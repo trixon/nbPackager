@@ -15,6 +15,7 @@
  */
 package se.trixon.nbpackager;
 
+import java.awt.Dimension;
 import javax.swing.JOptionPane;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -88,6 +89,8 @@ public final class PackagerTopComponent extends TopComponent {
                 return JOptionPane.showConfirmDialog(PackagerTopComponent.this, message, title, JOptionPane.YES_NO_OPTION) == JOptionPane.OK_OPTION;
             }
         });
+
+        setMinimumSize(new Dimension(1, 1));
     }
 
     /**
