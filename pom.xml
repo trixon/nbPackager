@@ -6,13 +6,12 @@
     <version>1.0.0-SNAPSHOT</version>
     <name>parent</name>
     <packaging>pom</packaging>
-    <description>Packages NetBeans Platform Application with a JRE for AppImage, Linux, MacOS and Windows.&lt;br/&gt;https://trixon.se/projects/nbpackager/</description>
-
-    <url>https://trixon.se/projects/nbpackager</url>
+    <description>Packages NetBeans Platform Application with a JRE for AppImage, Linux, MacOS and Windows.&lt;br/&gt;https://trixon.se/projects/packager/</description>
+    <url>https://trixon.se/projects/packager</url>
 
     <licenses>
         <license>
-            <name>The Apache Software License, Version 2.0</name>
+            <name>Apache Software License, Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>

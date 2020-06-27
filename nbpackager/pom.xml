@@ -9,13 +9,15 @@
     </parent>
     <artifactId>nbpackager</artifactId>
     <packaging>nbm</packaging>
+    <url>https://trixon.se/projects/packager</url>
+    <name>packager</name>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.netbeans.utilities</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>4.3</version>
+                <version>4.5</version>
                 <extensions>true</extensions>
             </plugin>
             <plugin>
