@@ -97,9 +97,19 @@
         <module>packager</module>
     </modules>
 
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-trixon-maven</id>
+            <url>https://dl.bintray.com/trixon/maven</url>
+        </repository>
+    </repositories>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.version>RELEASE113</netbeans.version>
-        <almond.version>11.0.6-SNAPSHOT</almond.version>
+        <almond.version>11.0.6</almond.version>
     </properties>
 </project>
