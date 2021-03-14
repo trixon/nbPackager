@@ -110,6 +110,10 @@ public class Operation {
     }
 
     private void copyJre(File jreDir, File targetDir) throws IOException {
+        if (jreDir == null) {
+            mLog.out("No jre specified.");
+            return;
+        }
         String etc = String.format("etc/%s.conf", mContentDir);
         String jreName = jreDir.getName();
         File destDir = new File(targetDir, jreName);
@@ -117,7 +121,9 @@ public class Operation {
         mLog.out("set jdkhome in " + etcFile.getAbsolutePath());
         mLog.out("copy jre to: " + destDir.getAbsolutePath());
         if (!mDryRun) {
-            FileUtils.write(etcFile, String.format("\n\n# Added by Packager\njdkhome=\"%s\"\n", jreName), "utf-8", true);
+            String etcContent = FileUtils.readFileToString(etcFile, "utf-8");
+            String key = StringUtils.contains(etcContent, "netbeans_jdkhome") ? "netbeans_jdkhome" : "jdkhome";
+            FileUtils.write(etcFile, String.format("\n\n# Added by Packager\n%s=\"%s\"\n", key, jreName), "utf-8", true);
             cp(jreDir, destDir, false);
         }
     }
