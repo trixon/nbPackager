@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2021 Patrik Karlström.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,9 @@ import se.trixon.almond.util.OptionsBase;
  */
 public class Options extends OptionsBase {
 
+    public static final String DEFAULT_APP_IMAGE_OPTIONS = "-nv";
+    public static final String DEFAULT_APP_IMAGE_TOOL = "/path/to/appimagetool-x86_64.AppImage";
+    public static final String DEFAULT_SNAP_OPTIONS = "";
     public static final String KEY_PROFILES = "profiles";
     public static final String KEY_PROFILE_APP_IMAGE_TEMPLATE = "app_image_template";
     public static final String KEY_PROFILE_CHECKSUM_SHA256 = "checksum.sha256";
@@ -34,16 +37,17 @@ public class Options extends OptionsBase {
     public static final String KEY_PROFILE_RESOURCES = "resources";
     public static final String KEY_PROFILE_SCRIPT_POST = "script.post";
     public static final String KEY_PROFILE_SCRIPT_PRE = "script.pre";
+    public static final String KEY_PROFILE_SNAP_TEMPLATE = "snap_template";
     public static final String KEY_PROFILE_SOURCE_DIR = "source";
     public static final String KEY_PROFILE_TARGET_ANY = "target.any";
-    public static final String KEY_PROFILE_TARGET_APP_IMAGE = "target.appimae";
+    public static final String KEY_PROFILE_TARGET_APP_IMAGE = "target.appimage";
     public static final String KEY_PROFILE_TARGET_LINUX = "target.linux";
     public static final String KEY_PROFILE_TARGET_MAC = "target.mac";
+    public static final String KEY_PROFILE_TARGET_SNAP = "target.snap";
     public static final String KEY_PROFILE_TARGET_WINDOWS = "target.windows";
     public static final String OPT_APP_IMAGE_OPTIONS = "appImage.options";
     public static final String OPT_APP_IMAGE_TOOL = "appImage.tool";
-    public static final String DEFAULT_APP_IMAGE_TOOL = "/path/to/appimagetool-x86_64.AppImage";
-    public static final String DEFAULT_APP_IMAGE_OPTIONS = "-nv";
+    public static final String OPT_SNAP_OPTIONS = "snap.options";
 
     public static Options getInstance() {
         return OptionsHolder.INSTANCE;

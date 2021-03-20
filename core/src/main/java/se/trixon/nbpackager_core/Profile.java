@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2021 Patrik Karlström.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,18 +39,20 @@ public class Profile {
     private File mJreLinux;
     private File mJreMac;
     private File mJreWindows;
+    private final transient Options mOptions = Options.getInstance();
     private File mPostScript;
     private File mPreScript;
     private File mResources;
+    private File mSnapTemplate;
     private File mSourceDir;
     private File mSourceFile;
     private boolean mTargetAny;
     private boolean mTargetAppImage;
     private boolean mTargetLinux;
     private boolean mTargetMac;
+    private boolean mTargetSnap;
     private boolean mTargetWindows;
     private StringBuilder mValidationErrorBuilder;
-    private Options mOptions = Options.getInstance();
 
     public Profile() {
     }
@@ -89,6 +91,10 @@ public class Profile {
 
     public File getResources() {
         return mResources;
+    }
+
+    public File getSnapTemplate() {
+        return mSnapTemplate;
     }
 
     public File getSourceDir() {
@@ -131,6 +137,10 @@ public class Profile {
         return mTargetMac;
     }
 
+    public boolean isTargetSnap() {
+        return mTargetSnap;
+    }
+
     public boolean isTargetWindows() {
         return mTargetWindows;
     }
@@ -166,6 +176,10 @@ public class Profile {
             addValidationError("invalid AppImage template directory: " + mAppImageTemplate);
         }
 
+        if (mSnapTemplate != null && !mSnapTemplate.isDirectory()) {
+            addValidationError("invalid Snap template directory: " + mSnapTemplate);
+        }
+
         if (mJreLinux != null && !mJreLinux.isDirectory()) {
             addValidationError("invalid Linux JRE: " + mJreLinux);
         }
@@ -184,6 +198,12 @@ public class Profile {
             addValidationError("invalid target: AppImage");
         }
 
+        if (mTargetSnap
+                && (mSnapTemplate == null || !mSnapTemplate.isDirectory())
+                && (mJreLinux == null || !mJreLinux.isDirectory())) {
+            addValidationError("invalid target: Snap");
+        }
+
         if (mTargetLinux
                 && (mJreLinux == null || !mJreLinux.isDirectory())) {
             addValidationError("invalid target: Linux");
@@ -199,7 +219,7 @@ public class Profile {
             addValidationError("invalid target: Windows");
         }
 
-        if ((mTargetAppImage || mTargetLinux || mTargetMac || mTargetWindows || mTargetAny) == false) {
+        if ((mTargetAppImage || mTargetSnap || mTargetLinux || mTargetMac || mTargetWindows || mTargetAny) == false) {
             addValidationError("invalid target: NO TARGET SELECTED");
         }
 
@@ -257,6 +277,10 @@ public class Profile {
         mResources = resources;
     }
 
+    public void setSnapTemplate(File snapTemplate) {
+        mSnapTemplate = snapTemplate;
+    }
+
     public void setSourceDir(File sourceDir) {
         mSourceDir = sourceDir;
     }
@@ -277,6 +301,10 @@ public class Profile {
         mTargetMac = targetMac;
     }
 
+    public void setTargetSnap(boolean targetSnap) {
+        mTargetSnap = targetSnap;
+    }
+
     public void setTargetWindows(boolean targetWindows) {
         mTargetWindows = targetWindows;
     }
@@ -289,6 +317,7 @@ public class Profile {
         values.put("POST execution", fileToString(mPostScript));
         values.put("Resources", fileToString(mResources));
         values.put("AppImage template", fileToString(mAppImageTemplate));
+        values.put("Snap template", fileToString(mSnapTemplate));
         values.put(" ", "");
         values.put("JRE", "");
         values.put(" Linux", fileToString(mJreLinux));
@@ -297,6 +326,7 @@ public class Profile {
         values.put("  ", "");
         values.put("Target  ", "");
         values.put(" AppImage", BooleanHelper.asYesNo(mTargetAppImage));
+        values.put(" Snap", BooleanHelper.asYesNo(mTargetSnap));
         values.put(" Linux ", BooleanHelper.asYesNo(mTargetLinux));
         values.put(" Mac ", BooleanHelper.asYesNo(mTargetMac));
         values.put(" Windows ", BooleanHelper.asYesNo(mTargetWindows));

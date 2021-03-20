@@ -20,11 +20,15 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="appImageFileChooserPanel" alignment="0" pref="388" max="32767" attributes="0"/>
+                  <Component id="appimagetoolOptionsTextField" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
-                      <Component id="appimagetoolOptionsLabel" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="appimagetoolOptionsLabel" min="-2" max="-2" attributes="0"/>
+                          <Component id="snapcraftOptionsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="appimagetoolOptionsTextField" max="32767" attributes="0"/>
+                  <Component id="snapcraftOptionsTextField" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -39,7 +43,11 @@
               <Component id="appimagetoolOptionsLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="appimagetoolOptionsTextField" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="179" max="32767" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="snapcraftOptionsLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="snapcraftOptionsTextField" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="101" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -56,6 +64,13 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="appimagetoolOptionsTextField">
+    </Component>
+    <Component class="javax.swing.JLabel" name="snapcraftOptionsLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Snapcraft options"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="snapcraftOptionsTextField">
     </Component>
   </SubComponents>
 </Form>

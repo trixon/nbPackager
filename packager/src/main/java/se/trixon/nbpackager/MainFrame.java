@@ -17,6 +17,7 @@ package se.trixon.nbpackager;
 
 import java.awt.event.WindowEvent;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.prefs.Preferences;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -171,6 +172,7 @@ public class MainFrame extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        Locale.setDefault(Locale.ENGLISH);
         SystemHelper.setMacApplicationName("nbPackager");
         sAlmondUI.installFlatLaf();
         sAlmondOptions.setDefaultLookAndFeel("FlatLaf Dark");
@@ -191,11 +193,11 @@ public class MainFrame extends javax.swing.JFrame {
         mOptions.setPreferences(Preferences.userNodeForPackage(MainFrame.class));
         SwingHelper.makeWindowResizable(mOptionsPanel);
 
-        PomInfo pomInfo = new PomInfo(MainFrame.class, "se.trixon.nbpackager", "nbpackager");
-        AboutModel aboutModel = new AboutModel(SystemHelper.getBundle(MainFrame.class, "about"), SystemHelper.getResourceAsImageIcon(MainFrame.class, "about_logo.png"));
+        var pomInfo = new PomInfo(MainFrame.class, "se.trixon.nbpackager", "packager");
+        var aboutModel = new AboutModel(SystemHelper.getBundle(MainFrame.class, "about"), SystemHelper.getResourceAsImageIcon(MainFrame.class, "about_logo.png"));
 
         aboutModel.setAppVersion(pomInfo.getVersion());
-        AboutPanel aboutPanel = new AboutPanel(aboutModel);
+        var aboutPanel = new AboutPanel(aboutModel);
         aboutMenuItem.setAction(AboutPanel.getAction(MainFrame.this, aboutPanel));
         mainPanel.getLog().setOut(s -> {
             logPanel.println(s);

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2021 Patrik Karlström.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,17 +41,19 @@ public class OptionsPanel extends javax.swing.JPanel {
         initComponents();
         appImageFileChooserPanel.setEnabled(SystemUtils.IS_OS_LINUX);
         appimagetoolOptionsTextField.setEnabled(SystemUtils.IS_OS_LINUX);
-
+        snapcraftOptionsTextField.setEnabled(SystemUtils.IS_OS_LINUX);
     }
 
     public void load() {
         appImageFileChooserPanel.setPath(mOptions.get(OPT_APP_IMAGE_TOOL, DEFAULT_APP_IMAGE_TOOL));
         appimagetoolOptionsTextField.setText(mOptions.get(OPT_APP_IMAGE_OPTIONS, DEFAULT_APP_IMAGE_OPTIONS));
+        snapcraftOptionsTextField.setText(mOptions.get(OPT_SNAP_OPTIONS, DEFAULT_SNAP_OPTIONS));
     }
 
     public void save() {
         mOptions.put(OPT_APP_IMAGE_TOOL, appImageFileChooserPanel.getPath());
         mOptions.put(OPT_APP_IMAGE_OPTIONS, appimagetoolOptionsTextField.getText());
+        mOptions.put(OPT_SNAP_OPTIONS, snapcraftOptionsTextField.getText());
     }
 
     public void setDocumentListener(DocumentListener documentListener) {
@@ -72,10 +74,14 @@ public class OptionsPanel extends javax.swing.JPanel {
         appImageFileChooserPanel = new se.trixon.almond.util.swing.dialogs.FileChooserPanel();
         appimagetoolOptionsLabel = new javax.swing.JLabel();
         appimagetoolOptionsTextField = new javax.swing.JTextField();
+        snapcraftOptionsLabel = new javax.swing.JLabel();
+        snapcraftOptionsTextField = new javax.swing.JTextField();
 
         appImageFileChooserPanel.setHeader("AppImageTool");
 
         appimagetoolOptionsLabel.setText("AppImageTool options");
+
+        snapcraftOptionsLabel.setText("Snapcraft options");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -85,10 +91,13 @@ public class OptionsPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(appImageFileChooserPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                    .addComponent(appimagetoolOptionsTextField)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(appimagetoolOptionsLabel)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(appimagetoolOptionsLabel)
+                            .addComponent(snapcraftOptionsLabel))
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(appimagetoolOptionsTextField))
+                    .addComponent(snapcraftOptionsTextField))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -100,7 +109,11 @@ public class OptionsPanel extends javax.swing.JPanel {
                 .addComponent(appimagetoolOptionsLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(appimagetoolOptionsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(179, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(snapcraftOptionsLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(snapcraftOptionsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(101, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -108,5 +121,7 @@ public class OptionsPanel extends javax.swing.JPanel {
     private se.trixon.almond.util.swing.dialogs.FileChooserPanel appImageFileChooserPanel;
     private javax.swing.JLabel appimagetoolOptionsLabel;
     private javax.swing.JTextField appimagetoolOptionsTextField;
+    private javax.swing.JLabel snapcraftOptionsLabel;
+    private javax.swing.JTextField snapcraftOptionsTextField;
     // End of variables declaration//GEN-END:variables
 }

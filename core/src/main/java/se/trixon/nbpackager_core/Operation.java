@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2021 Patrik Karlström.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import net.lingala.zip4j.ZipFile;
@@ -45,15 +46,19 @@ public class Operation {
     private File mDestDir;
     private final boolean mDryRun;
     private boolean mInterrupted;
+    private File mLinuxTargetFile;
     private final Log mLog;
     private final Options mOptions = Options.getInstance();
     private final Profile mProfile;
     private File mTempDir;
+    private String mVersion;
 
     public Operation(Profile profile, Log log) {
         mProfile = profile;
         mLog = log;
         mDryRun = mProfile.isDryRun();
+
+        mVersion = StringUtils.substringAfter(mProfile.getBasename(), "-");
     }
 
     public void start() throws IOException {
@@ -68,36 +73,40 @@ public class Operation {
 
         if (mProfile.getPreScript() != null) {
             mLog.out("Run PRE execution script");
-            executeScript(mProfile.getPreScript());
+            executeScript(null, null, mProfile.getPreScript());
         }
 
         if (!mInterrupted) {
             unzip();
         }
 
-        if (!mInterrupted & mProfile.isTargetAny()) {
+        if (!mInterrupted && mProfile.isTargetAny()) {
             createPackage("any");
         }
 
-        if (!mInterrupted & mProfile.isTargetLinux()) {
+        if (!mInterrupted && mProfile.isTargetLinux()) {
             createPackage("linux");
+
+            if (!mInterrupted && mProfile.isTargetAppImage()) {
+                createPackageAppImage();
+            }
+
+            if (!mInterrupted && mProfile.isTargetSnap()) {
+                createPackageSnap();
+            }
         }
 
-        if (!mInterrupted & mProfile.isTargetMac()) {
+        if (!mInterrupted && mProfile.isTargetMac()) {
             createPackage("mac");
         }
 
-        if (!mInterrupted & mProfile.isTargetWindows()) {
+        if (!mInterrupted && mProfile.isTargetWindows()) {
             createPackage("windows");
-        }
-
-        if (!mInterrupted & mProfile.isTargetAppImage()) {
-            createPackageAppImage();
         }
 
         if (!mInterrupted && mProfile.getPostScript() != null) {
             mLog.out("Run POST execution script");
-            executeScript(mProfile.getPostScript());
+            executeScript(null, null, mProfile.getPostScript());
         }
 
         FileUtils.deleteDirectory(mTempDir);
@@ -189,7 +198,10 @@ public class Operation {
             removeBin(new File(targetDir, "bin"), keepWindows);
         }
 
-        File targetFile = new File(mDestDir, String.format("%s-%s.zip", mProfile.getBasename(), target));
+        var targetFile = new File(mDestDir, String.format("%s-%s.zip", mProfile.getBasename(), target));
+        if (target.equals("linux")) {
+            mLinuxTargetFile = targetFile;
+        }
         mLog.out("creating zip: " + targetFile.getAbsolutePath());
         execute(null, targetDir.getParentFile(), "zip", "-qr", targetFile.getAbsolutePath(), mContentDir);
 
@@ -200,8 +212,8 @@ public class Operation {
         mLog.out("\ncreate package: AppImage");
         mLog.out("copy template to: " + mDestDir.getAbsolutePath());
         String templateName = mProfile.getAppImageTemplate().getName();
-        File targetDir = new File(mDestDir, templateName);
-        File targetFile = new File(mDestDir, StringUtils.replace(templateName, "AppDir", "AppImage"));
+        var targetDir = new File(mDestDir, templateName);
+        var targetFile = new File(mDestDir, StringUtils.replace(templateName, "AppDir", "AppImage"));
 
         if (!mDryRun) {
             cp(mProfile.getAppImageTemplate(), targetDir, false);
@@ -231,6 +243,48 @@ public class Operation {
         createChecksums(targetFile);
     }
 
+    private void createPackageSnap() throws IOException {
+        mLog.out("\ncreate package: Snap");
+        mLog.out("copy template to: " + mDestDir.getAbsolutePath());
+        String templateName = mProfile.getSnapTemplate().getName();
+        File targetDir = new File(mDestDir, templateName);
+
+        if (!mDryRun) {
+            mLog.out("copy zip contents to: " + targetDir.getAbsolutePath());
+            cp(mProfile.getSnapTemplate(), targetDir, false);
+            cp(mLinuxTargetFile, targetDir, true);
+
+            var preScriptFile = new File(targetDir, "exec_before");
+            if (preScriptFile.isFile()) {
+                mLog.out("Run PRE SNAP execution script");
+                executeScript(null, targetDir, preScriptFile);
+            }
+
+            File yaml = new File(targetDir, "snap/snapcraft.yaml");
+            List<String> lines = new ArrayList<>();
+            for (String line : FileUtils.readLines(yaml, "utf-8")) {
+                lines.add(line.replaceAll("version: '.*'", String.format("version: '%s'", mVersion)));
+            }
+
+            FileUtils.writeLines(yaml, "utf-8", lines);
+
+            HashMap<String, String> environment = new HashMap<>();
+            ArrayList<String> command = new ArrayList<>();
+            command.add("snapcraft");
+            for (String option : StringUtils.split(mOptions.get(OPT_SNAP_OPTIONS, ""))) {
+                command.add(option);
+            }
+
+            execute(command, environment, targetDir);
+
+            var postScriptFile = new File(targetDir, "exec_after");
+            if (postScriptFile.isFile()) {
+                mLog.out("Run POST SNAP execution script");
+                executeScript(null, targetDir, postScriptFile);
+            }
+        }
+    }
+
     private void execute(Map<String, String> environment, File workingDirectory, String... commands) {
         execute(new ArrayList<>(Arrays.asList(commands)), environment, workingDirectory);
     }
@@ -239,7 +293,7 @@ public class Operation {
         mLog.out(getHeader() + String.join(" ", command));
 
         if (!mDryRun) {
-            ProcessBuilder processBuilder = new ProcessBuilder(command).inheritIO();
+            var processBuilder = new ProcessBuilder(command).inheritIO();
             processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);
             if (environment != null) {
                 processBuilder.environment().putAll(environment);
@@ -262,8 +316,8 @@ public class Operation {
         }
     }
 
-    private void executeScript(File script) {
-        execute(null, null, script.getAbsolutePath());
+    private void executeScript(Map<String, String> environment, File workingDirectory, File script) {
+        execute(environment, workingDirectory, script.getAbsolutePath());
     }
 
     private String getHeader() {
