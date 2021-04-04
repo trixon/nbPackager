@@ -176,11 +176,15 @@ public class Operation {
             cp(mTempDir, targetDir, true);
         }
 
+        File baseDir = mProfile.getResources();
         targetDir = new File(targetDir, mContentDir);
-        if (mProfile.getResources() != null) {
+        if (baseDir != null) {
             mLog.out("copy resources to: " + targetDir.getAbsolutePath());
             if (!mDryRun) {
-                cp(mProfile.getResources(), targetDir, true);
+                cp(new File(baseDir, "any"), targetDir, true);
+                if (!"any".equals(target)) {
+                    cp(new File(baseDir, target), targetDir, true);
+                }
             }
         }
 
