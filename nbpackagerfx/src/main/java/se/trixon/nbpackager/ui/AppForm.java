@@ -356,6 +356,7 @@ public class AppForm extends BorderPane {
         alert.setHeaderText(null);
 
         var profilePanel = new ProfilePanel(profile);
+        profilePanel.setPrefWidth(999);
         var dialogPane = alert.getDialogPane();
         var button = (Button) dialogPane.lookupButton(ButtonType.OK);
         button.setText(Dict.SAVE.toString());

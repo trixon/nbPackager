@@ -41,34 +41,54 @@ public class Profile implements Comparable<Profile>, Cloneable {
             .setPrettyPrinting()
             .create();
 
-    private File mAppImageTemplate;
+    @SerializedName("baseName")
     private String mBasename;
+    @SerializedName("checksum256")
     private boolean mChecksumSha256;
+    @SerializedName("checksum512")
     private boolean mChecksumSha512;
     @SerializedName("description")
     private String mDescription;
+    @SerializedName("destDir")
     private File mDestDir;
-    private boolean mDryRun;
+    private transient boolean mDryRun;
+    @SerializedName("jreLinux")
     private File mJreLinux;
+    @SerializedName("jreMac")
     private File mJreMac;
+    @SerializedName("jreWindows")
     private File mJreWindows;
     @SerializedName("last_run")
     private long mLastRun;
+    @SerializedName("name")
     private String mName;
     private final transient Options mOptions = Options.getInstance();
-    private File mPostScript;
-    private File mPreScript;
-    private File mResources;
-    private File mSnapTemplate;
+    @SerializedName("resourceDir")
+    private File mResourceDir;
+    @SerializedName("scriptPost")
+    private File mScriptPost;
+    @SerializedName("scriptPre")
+    private File mScriptPre;
+    @SerializedName("sourceDir")
     private File mSourceDir;
-    private File mSourceFile;
+    private transient File mSourceFile;
+    @SerializedName("targetAny")
     private boolean mTargetAny;
-    private boolean mTargetAppImage;
+    @SerializedName("targetLinux")
     private boolean mTargetLinux;
+    @SerializedName("targetLinuxAppImage")
+    private boolean mTargetLinuxAppImage;
+    @SerializedName("targetLinuxSnap")
+    private boolean mTargetLinuxSnap;
+    @SerializedName("targetMac")
     private boolean mTargetMac;
-    private boolean mTargetSnap;
+    @SerializedName("targetWindows")
     private boolean mTargetWindows;
-    private StringBuilder mValidationErrorBuilder;
+    @SerializedName("templateDirAppImage")
+    private File mTemplateDirAppImage;
+    @SerializedName("templateDirSnap")
+    private File mTemplateDirSnap;
+    private transient StringBuilder mValidationErrorBuilder;
 
     public Profile() {
     }
@@ -88,10 +108,6 @@ public class Profile implements Comparable<Profile>, Cloneable {
     @Override
     public int compareTo(Profile o) {
         return mName.compareTo(o.getName());
-    }
-
-    public File getAppImageTemplate() {
-        return mAppImageTemplate;
     }
 
     public String getBasename() {
@@ -126,20 +142,16 @@ public class Profile implements Comparable<Profile>, Cloneable {
         return mName;
     }
 
-    public File getPostScript() {
-        return mPostScript;
+    public File getResourceDir() {
+        return mResourceDir;
     }
 
-    public File getPreScript() {
-        return mPreScript;
+    public File getScriptPost() {
+        return mScriptPost;
     }
 
-    public File getResources() {
-        return mResources;
-    }
-
-    public File getSnapTemplate() {
-        return mSnapTemplate;
+    public File getScriptPre() {
+        return mScriptPre;
     }
 
     public File getSourceDir() {
@@ -148,6 +160,14 @@ public class Profile implements Comparable<Profile>, Cloneable {
 
     public File getSourceFile() {
         return mSourceFile;
+    }
+
+    public File getTemplateDirAppImage() {
+        return mTemplateDirAppImage;
+    }
+
+    public File getTemplateDirSnap() {
+        return mTemplateDirSnap;
     }
 
     public String getValidationError() {
@@ -170,20 +190,20 @@ public class Profile implements Comparable<Profile>, Cloneable {
         return mTargetAny;
     }
 
-    public boolean isTargetAppImage() {
-        return mTargetAppImage;
-    }
-
     public boolean isTargetLinux() {
         return mTargetLinux;
     }
 
-    public boolean isTargetMac() {
-        return mTargetMac;
+    public boolean isTargetLinuxAppImage() {
+        return mTargetLinuxAppImage;
     }
 
-    public boolean isTargetSnap() {
-        return mTargetSnap;
+    public boolean isTargetLinuxSnap() {
+        return mTargetLinuxSnap;
+    }
+
+    public boolean isTargetMac() {
+        return mTargetMac;
     }
 
     public boolean isTargetWindows() {
@@ -205,24 +225,24 @@ public class Profile implements Comparable<Profile>, Cloneable {
             addValidationError("invalid destination directory: " + mDestDir);
         }
 
-        if (mPreScript != null && !mPreScript.isFile()) {
-            addValidationError("invalid pre script: " + mPreScript);
+        if (mScriptPre != null && !mScriptPre.isFile()) {
+            addValidationError("invalid pre script: " + mScriptPre);
         }
 
-        if (mPostScript != null && !mPostScript.isFile()) {
-            addValidationError("invalid post script: " + mPostScript);
+        if (mScriptPost != null && !mScriptPost.isFile()) {
+            addValidationError("invalid post script: " + mScriptPost);
         }
 
-        if (mResources != null && !mResources.isDirectory()) {
-            addValidationError("invalid resource directory: " + mResources);
+        if (mResourceDir != null && !mResourceDir.isDirectory()) {
+            addValidationError("invalid resource directory: " + mResourceDir);
         }
 
-        if (mAppImageTemplate != null && !mAppImageTemplate.isDirectory()) {
-            addValidationError("invalid AppImage template directory: " + mAppImageTemplate);
+        if (mTemplateDirAppImage != null && !mTemplateDirAppImage.isDirectory()) {
+            addValidationError("invalid AppImage template directory: " + mTemplateDirAppImage);
         }
 
-        if (mSnapTemplate != null && !mSnapTemplate.isDirectory()) {
-            addValidationError("invalid Snap template directory: " + mSnapTemplate);
+        if (mTemplateDirSnap != null && !mTemplateDirSnap.isDirectory()) {
+            addValidationError("invalid Snap template directory: " + mTemplateDirSnap);
         }
 
         if (mJreLinux != null && !mJreLinux.isDirectory()) {
@@ -237,14 +257,14 @@ public class Profile implements Comparable<Profile>, Cloneable {
             addValidationError("invalid Windows JRE: " + mJreWindows);
         }
 
-        if (mTargetAppImage
-                && (mAppImageTemplate == null || !mAppImageTemplate.isDirectory())
+        if (mTargetLinuxAppImage
+                && (mTemplateDirAppImage == null || !mTemplateDirAppImage.isDirectory())
                 && (mJreLinux == null || !mJreLinux.isDirectory())) {
             addValidationError("invalid target: AppImage");
         }
 
-        if (mTargetSnap
-                && (mSnapTemplate == null || !mSnapTemplate.isDirectory())
+        if (mTargetLinuxSnap
+                && (mTemplateDirSnap == null || !mTemplateDirSnap.isDirectory())
                 && (mJreLinux == null || !mJreLinux.isDirectory())) {
             addValidationError("invalid target: Snap");
         }
@@ -264,11 +284,11 @@ public class Profile implements Comparable<Profile>, Cloneable {
             addValidationError("invalid target: Windows");
         }
 
-        if ((mTargetAppImage || mTargetSnap || mTargetLinux || mTargetMac || mTargetWindows || mTargetAny) == false) {
+        if ((mTargetLinuxAppImage || mTargetLinuxSnap || mTargetLinux || mTargetMac || mTargetWindows || mTargetAny) == false) {
             addValidationError("invalid target: NO TARGET SELECTED");
         }
 
-        if (mTargetAppImage) {
+        if (mTargetLinuxAppImage) {
             File appImageTool = new File(mOptions.get(OPT_APP_IMAGE_TOOL, DEFAULT_APP_IMAGE_TOOL));
             if (!appImageTool.isFile()) {
                 addValidationError(String.format("invalid appimagetool: Check your settings (%s)", appImageTool.getAbsolutePath()));
@@ -276,10 +296,6 @@ public class Profile implements Comparable<Profile>, Cloneable {
         }
 
         return mValidationErrorBuilder.length() == 0;
-    }
-
-    public void setAppImageTemplate(File appImageTemplate) {
-        mAppImageTemplate = appImageTemplate;
     }
 
     public void setChecksumSha256(boolean checksumSha256) {
@@ -322,20 +338,16 @@ public class Profile implements Comparable<Profile>, Cloneable {
         mName = name;
     }
 
-    public void setPostScript(File postScript) {
-        mPostScript = postScript;
+    public void setResourceDir(File resourceDir) {
+        mResourceDir = resourceDir;
     }
 
-    public void setPreScript(File preScript) {
-        mPreScript = preScript;
+    public void setScriptPost(File scriptPost) {
+        mScriptPost = scriptPost;
     }
 
-    public void setResources(File resources) {
-        mResources = resources;
-    }
-
-    public void setSnapTemplate(File snapTemplate) {
-        mSnapTemplate = snapTemplate;
+    public void setScriptPre(File scriptPre) {
+        mScriptPre = scriptPre;
     }
 
     public void setSourceDir(File sourceDir) {
@@ -346,35 +358,43 @@ public class Profile implements Comparable<Profile>, Cloneable {
         mTargetAny = targetAny;
     }
 
-    public void setTargetAppImage(boolean targetAppImage) {
-        mTargetAppImage = targetAppImage;
-    }
-
     public void setTargetLinux(boolean targetLinux) {
         mTargetLinux = targetLinux;
+    }
+
+    public void setTargetLinuxAppImage(boolean targetLinuxAppImage) {
+        mTargetLinuxAppImage = targetLinuxAppImage;
+    }
+
+    public void setTargetLinuxSnap(boolean targetLinuxSnap) {
+        mTargetLinuxSnap = targetLinuxSnap;
     }
 
     public void setTargetMac(boolean targetMac) {
         mTargetMac = targetMac;
     }
 
-    public void setTargetSnap(boolean targetSnap) {
-        mTargetSnap = targetSnap;
-    }
-
     public void setTargetWindows(boolean targetWindows) {
         mTargetWindows = targetWindows;
+    }
+
+    public void setTemplateDirAppImage(File templateDirAppImage) {
+        mTemplateDirAppImage = templateDirAppImage;
+    }
+
+    public void setTemplateDirSnap(File templateDirSnap) {
+        mTemplateDirSnap = templateDirSnap;
     }
 
     public String toDebugString() {
         LinkedHashMap<String, String> values = new LinkedHashMap<>();
         values.put("Source", fileToString(mSourceDir));
         values.put("Destination", fileToString(mDestDir));
-        values.put("PRE execution", fileToString(mPreScript));
-        values.put("POST execution", fileToString(mPostScript));
-        values.put("Resources", fileToString(mResources));
-        values.put("AppImage template", fileToString(mAppImageTemplate));
-        values.put("Snap template", fileToString(mSnapTemplate));
+        values.put("PRE execution", fileToString(mScriptPre));
+        values.put("POST execution", fileToString(mScriptPost));
+        values.put("Resources", fileToString(mResourceDir));
+        values.put("AppImage template", fileToString(mTemplateDirAppImage));
+        values.put("Snap template", fileToString(mTemplateDirSnap));
         values.put(" ", "");
         values.put("JRE", "");
         values.put(" Linux", fileToString(mJreLinux));
@@ -382,8 +402,8 @@ public class Profile implements Comparable<Profile>, Cloneable {
         values.put(" Windows", fileToString(mJreWindows));
         values.put("  ", "");
         values.put("Target  ", "");
-        values.put(" AppImage", BooleanHelper.asYesNo(mTargetAppImage));
-        values.put(" Snap", BooleanHelper.asYesNo(mTargetSnap));
+        values.put(" AppImage", BooleanHelper.asYesNo(mTargetLinuxAppImage));
+        values.put(" Snap", BooleanHelper.asYesNo(mTargetLinuxSnap));
         values.put(" Linux ", BooleanHelper.asYesNo(mTargetLinux));
         values.put(" Mac ", BooleanHelper.asYesNo(mTargetMac));
         values.put(" Windows ", BooleanHelper.asYesNo(mTargetWindows));

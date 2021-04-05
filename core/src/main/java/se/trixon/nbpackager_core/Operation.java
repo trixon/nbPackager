@@ -71,9 +71,9 @@ public class Operation {
             }
         }
 
-        if (mProfile.getPreScript() != null) {
+        if (mProfile.getScriptPre() != null) {
             mLog.out("Run PRE execution script");
-            executeScript(null, null, mProfile.getPreScript());
+            executeScript(null, null, mProfile.getScriptPre());
         }
 
         if (!mInterrupted) {
@@ -87,11 +87,11 @@ public class Operation {
         if (!mInterrupted && mProfile.isTargetLinux()) {
             createPackage("linux");
 
-            if (!mInterrupted && mProfile.isTargetAppImage()) {
+            if (!mInterrupted && mProfile.isTargetLinuxAppImage()) {
                 createPackageAppImage();
             }
 
-            if (!mInterrupted && mProfile.isTargetSnap()) {
+            if (!mInterrupted && mProfile.isTargetLinuxSnap()) {
                 createPackageSnap();
             }
         }
@@ -104,9 +104,9 @@ public class Operation {
             createPackage("windows");
         }
 
-        if (!mInterrupted && mProfile.getPostScript() != null) {
+        if (!mInterrupted && mProfile.getScriptPost() != null) {
             mLog.out("Run POST execution script");
-            executeScript(null, null, mProfile.getPostScript());
+            executeScript(null, null, mProfile.getScriptPost());
         }
 
         FileUtils.deleteDirectory(mTempDir);
@@ -176,7 +176,7 @@ public class Operation {
             cp(mTempDir, targetDir, true);
         }
 
-        File baseDir = mProfile.getResources();
+        File baseDir = mProfile.getResourceDir();
         targetDir = new File(targetDir, mContentDir);
         if (baseDir != null) {
             mLog.out("copy resources to: " + targetDir.getAbsolutePath());
@@ -222,12 +222,12 @@ public class Operation {
     private void createPackageAppImage() throws IOException {
         mLog.out("\ncreate package: AppImage");
         mLog.out("copy template to: " + mDestDir.getAbsolutePath());
-        String templateName = mProfile.getAppImageTemplate().getName();
+        String templateName = mProfile.getTemplateDirAppImage().getName();
         var targetDir = new File(mDestDir, templateName);
         var targetFile = new File(mDestDir, StringUtils.replace(templateName, "AppDir", "AppImage"));
 
         if (!mDryRun) {
-            cp(mProfile.getAppImageTemplate(), targetDir, false);
+            cp(mProfile.getTemplateDirAppImage(), targetDir, false);
         }
 
         File usrDir = new File(targetDir, "usr");
@@ -257,12 +257,12 @@ public class Operation {
     private void createPackageSnap() throws IOException {
         mLog.out("\ncreate package: Snap");
         mLog.out("copy template to: " + mDestDir.getAbsolutePath());
-        String templateName = mProfile.getSnapTemplate().getName();
+        String templateName = mProfile.getTemplateDirSnap().getName();
         File targetDir = new File(mDestDir, templateName);
 
         if (!mDryRun) {
             mLog.out("copy zip contents to: " + targetDir.getAbsolutePath());
-            cp(mProfile.getSnapTemplate(), targetDir, false);
+            cp(mProfile.getTemplateDirSnap(), targetDir, false);
             cp(mLinuxTargetFile, targetDir, true);
 
             var preScriptFile = new File(targetDir, "exec_before");

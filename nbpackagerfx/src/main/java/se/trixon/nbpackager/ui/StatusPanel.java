@@ -129,7 +129,7 @@ public class StatusPanel extends BorderPane {
 
             if (newValue != null) {
                 mNameLabel.setText(newValue.getName());
-//                mDescLabel.setText(newValue.getDescriptionString());
+                mDescLabel.setText(newValue.getDescription());
 //                mLogInfoPanel.println(newValue.toInfoString());
             } else {
                 mNameLabel.setText("");

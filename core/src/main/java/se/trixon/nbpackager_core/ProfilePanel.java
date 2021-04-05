@@ -98,17 +98,17 @@ public class ProfilePanel extends javax.swing.JPanel {
         var profile = new Profile();
         profile.setSourceDir(sourceFileChooserPanel.getFile());
         profile.setDestDir(destFileChooserPanel.getFile());
-        profile.setPreScript(preScriptFileChooserPanel.getFile());
-        profile.setPostScript(postScriptFileChooserPanel.getFile());
-        profile.setResources(resourcesFileChooserPanel.getFile());
-        profile.setAppImageTemplate(appImageTemplateFileChooserPanel.getFile());
-        profile.setSnapTemplate(snapTemplateFileChooserPanel.getFile());
+        profile.setScriptPre(preScriptFileChooserPanel.getFile());
+        profile.setScriptPost(postScriptFileChooserPanel.getFile());
+        profile.setResourceDir(resourcesFileChooserPanel.getFile());
+        profile.setTemplateDirAppImage(appImageTemplateFileChooserPanel.getFile());
+        profile.setTemplateDirSnap(snapTemplateFileChooserPanel.getFile());
         profile.setJreLinux(linuxFileChooserPanel.getFile());
         profile.setJreMac(macFileChooserPanel.getFile());
         profile.setJreWindows(windowsFileChooserPanel.getFile());
 
-        profile.setTargetAppImage(appCheckBox.isSelected());
-        profile.setTargetSnap(snapCheckBox.isSelected());
+        profile.setTargetLinuxAppImage(appCheckBox.isSelected());
+        profile.setTargetLinuxSnap(snapCheckBox.isSelected());
         profile.setTargetLinux(linuxCheckBox.isSelected());
         profile.setTargetMac(macCheckBox.isSelected());
         profile.setTargetWindows(windowsCheckBox.isSelected());

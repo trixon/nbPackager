@@ -15,6 +15,8 @@
  */
 package se.trixon.nbpackager;
 
+import java.util.Locale;
+
 /**
  *
  * @author Patrik Karlström
@@ -25,6 +27,8 @@ public class AppStart {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        Locale.setDefault(Locale.ENGLISH);
+
         new Thread(() -> {
             App.main(args);
         }).start();
