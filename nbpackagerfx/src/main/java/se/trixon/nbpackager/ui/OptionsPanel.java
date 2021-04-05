@@ -16,12 +16,22 @@
 package se.trixon.nbpackager.ui;
 
 import javafx.geometry.Insets;
+import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import org.controlsfx.control.ToggleSwitch;
 import se.trixon.almond.util.Dict;
 import se.trixon.almond.util.fx.FxHelper;
+import se.trixon.almond.util.fx.control.FileChooserPane;
 import se.trixon.nbpackager.Options;
+import static se.trixon.nbpackager_core.Options.DEFAULT_APP_IMAGE_OPTIONS;
+import static se.trixon.nbpackager_core.Options.DEFAULT_APP_IMAGE_TOOL;
+import static se.trixon.nbpackager_core.Options.DEFAULT_SNAP_OPTIONS;
+import static se.trixon.nbpackager_core.Options.OPT_APP_IMAGE_OPTIONS;
+import static se.trixon.nbpackager_core.Options.OPT_APP_IMAGE_TOOL;
+import static se.trixon.nbpackager_core.Options.OPT_SNAP_OPTIONS;
 
 /**
  *
@@ -29,12 +39,26 @@ import se.trixon.nbpackager.Options;
  */
 public class OptionsPanel extends GridPane {
 
+    private FileChooserPane mAppImageChooserPane;
+    private TextField mAppImageTextField;
+    private final se.trixon.nbpackager_core.Options mCoreOptions = se.trixon.nbpackager_core.Options.getInstance();
     private final ToggleSwitch mNightModeToggleSwitch = new ToggleSwitch(Dict.NIGHT_MODE.toString());
     private final Options mOptions = Options.getInstance();
+    private TextField mSnapcraftTextField;
     private final ToggleSwitch mWordWrapToggleSwitch = new ToggleSwitch(Dict.DYNAMIC_WORD_WRAP.toString());
 
     public OptionsPanel() {
         createUI();
+
+        mAppImageChooserPane.setPath(mCoreOptions.get(OPT_APP_IMAGE_TOOL, DEFAULT_APP_IMAGE_TOOL));
+        mAppImageTextField.setText(mCoreOptions.get(OPT_APP_IMAGE_OPTIONS, DEFAULT_APP_IMAGE_OPTIONS));
+        mSnapcraftTextField.setText(mCoreOptions.get(OPT_SNAP_OPTIONS, DEFAULT_SNAP_OPTIONS));
+    }
+
+    public void save() {
+        mCoreOptions.put(OPT_APP_IMAGE_TOOL, mAppImageChooserPane.getPathAsString());
+        mCoreOptions.put(OPT_APP_IMAGE_OPTIONS, mAppImageTextField.getText());
+        mCoreOptions.put(OPT_SNAP_OPTIONS, mSnapcraftTextField.getText());
     }
 
     private void createUI() {
@@ -42,13 +66,29 @@ public class OptionsPanel extends GridPane {
         setVgap(2);
         //setGridLinesVisible(true);
         FxHelper.autoSizeColumn(this, 1);
+        mAppImageChooserPane = new FileChooserPane(Dict.SELECT.toString(), "AppImageTool", FileChooserPane.ObjectMode.FILE, SelectionMode.SINGLE);
+        mAppImageTextField = new TextField();
+        mSnapcraftTextField = new TextField();
 
+        var appImageLabel = new Label("AppImageTool options");
+        var snapcraftLabel = new Label("Snapcraft options");
         int row = 0;
+
+        add(mAppImageChooserPane, 0, row++, 1, 1);
+        add(appImageLabel, 0, row++, 1, 1);
+        add(mAppImageTextField, 0, row++, 1, 1);
+        add(snapcraftLabel, 0, row++, 1, 1);
+        add(mSnapcraftTextField, 0, row++, 1, 1);
         add(mWordWrapToggleSwitch, 0, row++, 1, 1);
         add(mNightModeToggleSwitch, 0, row++, 1, 1);
 
-        FxHelper.setPadding(new Insets(28, 0, 0, 0),
+        FxHelper.setPadding(new Insets(8, 0, 0, 0),
+                appImageLabel,
+                snapcraftLabel,
                 mNightModeToggleSwitch
+        );
+        FxHelper.setPadding(new Insets(18, 0, 0, 0),
+                mWordWrapToggleSwitch
         );
 
         for (var columnConstraint : getColumnConstraints()) {

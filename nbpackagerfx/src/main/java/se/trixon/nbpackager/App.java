@@ -142,6 +142,7 @@ public class App extends Application {
     private void displayOptions() {
         if (mOptionsPanel == null) {
             mOptionsPanel = new OptionsPanel();
+            mOptionsPanel.setPrefWidth(600);
         }
 
         var alert = new Alert(Alert.AlertType.INFORMATION);
@@ -159,6 +160,7 @@ public class App extends Application {
         button.setText(Dict.CLOSE.toString());
 
         FxHelper.showAndWait(alert, mStage);
+        mOptionsPanel.save();
     }
 
     private void initAccelerators() {

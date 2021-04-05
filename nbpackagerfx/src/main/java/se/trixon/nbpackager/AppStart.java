@@ -16,6 +16,7 @@
 package se.trixon.nbpackager;
 
 import java.util.Locale;
+import java.util.prefs.Preferences;
 
 /**
  *
@@ -28,6 +29,7 @@ public class AppStart {
      */
     public static void main(String[] args) {
         Locale.setDefault(Locale.ENGLISH);
+        se.trixon.nbpackager_core.Options.getInstance().setPreferences(Preferences.userNodeForPackage(App.class));
 
         new Thread(() -> {
             App.main(args);
