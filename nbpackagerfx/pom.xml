@@ -36,27 +36,30 @@
                             <minimizeJar>true</minimizeJar>
                             <filters>
                                 <filter>
-                                    <artifact>com.formdev:flatlaf</artifact>
-                                    <includes>
-                                        <include>com/formdev/flatlaf/**</include>
-                                    </includes>
-                                </filter>
-                                <filter>
                                     <artifact>se.trixon.almond:almond-util</artifact>
                                     <includes>
                                         <include>se/trixon/almond/util/*</include>
-                                        <include>se/trixon/almond/util/swing/**</include>
-                                        <include>se/trixon/almond/util/icons/*</include>
+                                        <include>se/trixon/almond/util/ext/**</include>
+                                        <include>se/trixon/almond/util/fx/**</include>
                                         <include>se/trixon/almond/util/icons/material/*</include>
-                                        <include>se/trixon/almond/util/icons/material/swing/*</include>
-                                        <include>se/trixon/almond/util/icons/material/_action/*.png</include>
-                                        <include>se/trixon/almond/util/icons/material/_alert/*.png</include>
-                                        <include>se/trixon/almond/util/icons/material/_av/*.png</include>
-                                        <include>se/trixon/almond/util/icons/material/_communication/*.png</include>
-                                        <include>se/trixon/almond/util/icons/material/_content/*.png</include>
-                                        <include>se/trixon/almond/util/icons/material/_editor/*.png</include>
-                                        <include>se/trixon/almond/util/icons/material/_file/folder_open*</include>
-                                        <include>se/trixon/almond/util/icons/material/_navigation/*.png</include>
+                                        <include>se/trixon/almond/util/icons/material/_action/*</include>
+                                        <include>se/trixon/almond/util/icons/material/_av/*</include>
+                                        <include>se/trixon/almond/util/icons/material/_content/*</include>
+                                        <include>se/trixon/almond/util/swing/*</include>
+                                    </includes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.controlsfx:controlsfx</artifact>
+                                    <excludes>
+                                        <exclude>org/controlsfx/control/spreadsheet/*</exclude>
+                                        <exclude>org/controlsfx/control/textfield/*</exclude>
+                                        <exclude>org/controlsfx/control/table/*</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.openjfx:*</artifact>
+                                    <includes>
+                                        <include>**</include>
                                     </includes>
                                 </filter>
                             </filters>
@@ -169,6 +172,11 @@
             <version>${javafx.version}</version>
             <classifier>win</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -179,12 +187,12 @@
             <artifactId>almond-util</artifactId>
             <exclusions>
                 <exclusion>
-                    <groupId>org.controlsfx</groupId>
-                    <artifactId>controlsfx</artifactId>
+                    <groupId>com.github.oshi</groupId>
+                    <artifactId>oshi-core</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>*</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-csv</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
