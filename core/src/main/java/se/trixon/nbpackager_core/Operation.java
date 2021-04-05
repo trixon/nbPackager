@@ -203,11 +203,18 @@ public class Operation {
         }
 
         var targetFile = new File(mDestDir, String.format("%s-%s.zip", mProfile.getBasename(), target));
+        var contentDir = mContentDir;
         if (target.equals("linux")) {
             mLinuxTargetFile = targetFile;
+        } else if (target.equals("mac")) {
+            var oldTargetDir = targetDir;
+            targetDir = new File(targetDir.getPath() + ".app");
+            FileUtils.moveDirectory(oldTargetDir, targetDir);
+            contentDir += ".app";
         }
+
         mLog.out("creating zip: " + targetFile.getAbsolutePath());
-        execute(null, targetDir.getParentFile(), "zip", "-qr", targetFile.getAbsolutePath(), mContentDir);
+        execute(null, targetDir.getParentFile(), "zip", "-qr", targetFile.getAbsolutePath(), contentDir);
 
         createChecksums(targetFile);
     }
