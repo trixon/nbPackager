@@ -45,6 +45,8 @@ public class Profile implements Comparable<Profile>, Cloneable {
     private String mBasename;
     private boolean mChecksumSha256;
     private boolean mChecksumSha512;
+    @SerializedName("description")
+    private String mDescription;
     private File mDestDir;
     private boolean mDryRun;
     private File mJreLinux;
@@ -94,6 +96,10 @@ public class Profile implements Comparable<Profile>, Cloneable {
 
     public String getBasename() {
         return mBasename;
+    }
+
+    public String getDescription() {
+        return mDescription;
     }
 
     public File getDestDir() {
@@ -282,6 +288,10 @@ public class Profile implements Comparable<Profile>, Cloneable {
 
     public void setChecksumSha512(boolean checksumSha512) {
         mChecksumSha512 = checksumSha512;
+    }
+
+    public void setDescription(String description) {
+        mDescription = description;
     }
 
     public void setDestDir(File destDir) {

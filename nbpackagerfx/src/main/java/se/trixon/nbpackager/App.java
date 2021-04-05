@@ -112,7 +112,7 @@ public class App extends Application {
         FxHelper.setTooltip(mHelpAction, new KeyCodeCombination(KeyCode.F1, KeyCombination.SHORTCUT_ANY));
 
         //about
-        var pomInfo = new PomInfo(App.class, "se.trixon", "mapollage");
+        var pomInfo = new PomInfo(App.class, "se.trixon", "nbpackagerfx");
         var aboutModel = new AboutModel(SystemHelper.getBundle(App.class, "about"), SystemHelperFx.getResourceAsImageView(App.class, "about_logo.png"));
         aboutModel.setAppVersion(pomInfo.getVersion());
         mAboutAction = AboutPane.getAction(mStage, aboutModel);
