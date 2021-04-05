@@ -94,6 +94,7 @@
     <modules>
         <module>core</module>
         <module>nbpackager</module>
+        <module>nbpackagerfx</module>
         <module>packager</module>
     </modules>
 
