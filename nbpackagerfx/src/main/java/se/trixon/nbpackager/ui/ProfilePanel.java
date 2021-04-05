@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2021 Patrik Karlström.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,13 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.trixon.nbpackager;
+package se.trixon.nbpackager.ui;
+
+import javafx.scene.control.Button;
+import javafx.scene.layout.GridPane;
+import se.trixon.nbpackager_core.Profile;
 
 /**
  *
  * @author Patrik Karlström
  */
-public enum RunState {
-    STARTABLE,
-    CANCELABLE
+public class ProfilePanel extends GridPane {
+
+    ProfilePanel(Profile profile) {
+    }
+
+    void save() {
+    }
+
+    void setOkButton(Button button) {
+    }
+
 }

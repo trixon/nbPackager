@@ -16,6 +16,7 @@
 package se.trixon.nbpackager;
 
 import de.jangassen.MenuToolkit;
+import java.util.Arrays;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -32,6 +33,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.apache.commons.lang3.SystemUtils;
 import org.controlsfx.control.action.Action;
+import org.controlsfx.control.action.ActionUtils;
 import se.trixon.almond.util.Dict;
 import se.trixon.almond.util.PomInfo;
 import se.trixon.almond.util.SnapHelperFx;
@@ -116,25 +118,25 @@ public class App extends Application {
         mAboutAction = AboutPane.getAction(mStage, aboutModel);
 
         mRoot = new BorderPane(mAppForm = new AppForm());
-//        var actions = mAppForm.getToolBarActions();
-//        actions.addAll(Arrays.asList(
-//                ActionUtils.ACTION_SPAN,
-//                ActionUtils.ACTION_SPAN,
-//                mOptionsAction,
-//                mAboutAction,
-//                mHelpAction
-//        ));
+        var actions = mAppForm.getToolBarActions();
+        actions.addAll(Arrays.asList(
+                ActionUtils.ACTION_SPAN,
+                ActionUtils.ACTION_SPAN,
+                mOptionsAction,
+                mAboutAction,
+                mHelpAction
+        ));
 
-//        var toolBar = ActionUtils.createToolBar(actions, ActionUtils.ActionTextBehavior.HIDE);
-//        FxHelper.undecorateButtons(toolBar.getItems().stream());
-//        FxHelper.slimToolBar(toolBar);
-//
-//        mRoot.setTop(toolBar);
+        var toolBar = ActionUtils.createToolBar(actions, ActionUtils.ActionTextBehavior.HIDE);
+        FxHelper.undecorateButtons(toolBar.getItems().stream());
+        FxHelper.slimToolBar(toolBar);
+
+        mRoot.setTop(toolBar);
         mStage.setScene(new Scene(mRoot));
     }
 
     private void displayHelp() {
-        SystemHelper.desktopBrowse("https://trixon.se/projects/mapollage/documentation/");
+        SystemHelper.desktopBrowse("https://trixon.se/projects/nbpackager");
     }
 
     private void displayOptions() {

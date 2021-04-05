@@ -15,9 +15,14 @@
  */
 package se.trixon.nbpackager_core;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.LinkedHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import se.trixon.almond.util.BooleanHelper;
@@ -28,7 +33,13 @@ import static se.trixon.nbpackager_core.Options.OPT_APP_IMAGE_TOOL;
  *
  * @author Patrik Karlström
  */
-public class Profile {
+public class Profile implements Comparable<Profile>, Cloneable {
+
+    private static final Gson GSON = new GsonBuilder()
+            .setVersion(1.0)
+            .serializeNulls()
+            .setPrettyPrinting()
+            .create();
 
     private File mAppImageTemplate;
     private String mBasename;
@@ -39,6 +50,9 @@ public class Profile {
     private File mJreLinux;
     private File mJreMac;
     private File mJreWindows;
+    @SerializedName("last_run")
+    private long mLastRun;
+    private String mName;
     private final transient Options mOptions = Options.getInstance();
     private File mPostScript;
     private File mPreScript;
@@ -55,6 +69,23 @@ public class Profile {
     private StringBuilder mValidationErrorBuilder;
 
     public Profile() {
+    }
+
+    @Override
+    public Profile clone() {
+        try {
+            super.clone();
+            String json = GSON.toJson(this);
+            return GSON.fromJson(json, Profile.class);
+        } catch (CloneNotSupportedException ex) {
+            Logger.getLogger(Profile.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+
+    @Override
+    public int compareTo(Profile o) {
+        return mName.compareTo(o.getName());
     }
 
     public File getAppImageTemplate() {
@@ -79,6 +110,14 @@ public class Profile {
 
     public File getJreWindows() {
         return mJreWindows;
+    }
+
+    public long getLastRun() {
+        return mLastRun;
+    }
+
+    public String getName() {
+        return mName;
     }
 
     public File getPostScript() {
@@ -263,6 +302,14 @@ public class Profile {
 
     public void setJreWindows(File jreWindows) {
         mJreWindows = jreWindows;
+    }
+
+    public void setLastRun(long lastRun) {
+        this.mLastRun = lastRun;
+    }
+
+    public void setName(String name) {
+        mName = name;
     }
 
     public void setPostScript(File postScript) {

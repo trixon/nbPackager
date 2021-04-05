@@ -23,6 +23,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import se.trixon.almond.util.SystemHelper;
 import se.trixon.almond.util.fx.FxHelper;
 import se.trixon.nbpackager_core.Profile;
+import se.trixon.nbpackager_core.RunState;
 
 /**
  *
