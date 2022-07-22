@@ -42,7 +42,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.10.1</version>
                     <configuration>
                         <showDeprecation>true</showDeprecation>
                         <source>11</source>
@@ -52,12 +52,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.2.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.8.1</version>
+                    <version>2.11.0</version>
                     <configuration>
                         <generateBackupPoms>false</generateBackupPoms>
                     </configuration>
@@ -98,19 +98,9 @@
         <module>packager</module>
     </modules>
 
-    <repositories>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>bintray-trixon-maven</id>
-            <url>https://dl.bintray.com/trixon/maven</url>
-        </repository>
-    </repositories>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <netbeans.version>RELEASE120</netbeans.version>
-        <almond.version>11.0.8-SNAPSHOT</almond.version>
+        <netbeans.version>RELEASE140</netbeans.version>
+        <almond.version>17.0.0-SNAPSHOT</almond.version>
     </properties>
 </project>
