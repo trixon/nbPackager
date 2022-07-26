@@ -41,8 +41,7 @@ public class Profile implements Comparable<Profile>, Cloneable {
             .setPrettyPrinting()
             .create();
 
-    @SerializedName("baseName")
-    private String mBasename;
+    private transient String mBasename;
     @SerializedName("checksum256")
     private boolean mChecksumSha256;
     @SerializedName("checksum512")
@@ -331,7 +330,7 @@ public class Profile implements Comparable<Profile>, Cloneable {
     }
 
     public void setLastRun(long lastRun) {
-        this.mLastRun = lastRun;
+        mLastRun = lastRun;
     }
 
     public void setName(String name) {

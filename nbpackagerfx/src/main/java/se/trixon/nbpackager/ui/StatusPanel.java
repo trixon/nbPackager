@@ -15,7 +15,6 @@
  */
 package se.trixon.nbpackager.ui;
 
-import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
@@ -30,7 +29,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import se.trixon.almond.util.Dict;
-import se.trixon.almond.util.SystemHelper;
 import se.trixon.almond.util.fx.FxHelper;
 import se.trixon.almond.util.fx.control.LogPanel;
 import se.trixon.nbpackager.Options;
@@ -42,9 +40,7 @@ import se.trixon.nbpackager.RunManager;
  */
 public class StatusPanel extends BorderPane {
 
-    private final ResourceBundle mBundle = SystemHelper.getBundle(AppForm.class, "Bundle");
     private final Label mDescLabel = new Label();
-    private final LogPanel mLogErrPanel = new LogPanel();
     private final LogPanel mLogInfoPanel = new LogPanel();
     private final LogPanel mLogOutPanel = new LogPanel();
     private final Label mNameLabel = new Label();
@@ -60,11 +56,10 @@ public class StatusPanel extends BorderPane {
 
     void clear() {
         mLogOutPanel.clear();
-        mLogErrPanel.clear();
     }
 
     void err(String message) {
-        mLogErrPanel.println(message);
+        out(message);
     }
 
     void out(String message) {
@@ -102,16 +97,14 @@ public class StatusPanel extends BorderPane {
         setTop(topBox);
 
         mLogOutPanel.setMonospaced();
-        mLogErrPanel.setMonospaced();
         mLogInfoPanel.setMonospaced();
 
         var outTab = new Tab(Dict.OUTPUT.toString(), mLogOutPanel);
-        var errTab = new Tab(Dict.Dialog.ERROR.toString(), mLogErrPanel);
         var infoTab = new Tab(Dict.INFORMATION.toString(), mLogInfoPanel);
 
         mTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         mTabPane.setSide(Side.BOTTOM);
-        mTabPane.getTabs().setAll(outTab, errTab, infoTab);
+        mTabPane.getTabs().setAll(outTab, infoTab);
         setCenter(mTabPane);
 
         mLogOutPanel.setWrapText(mOptions.isWordWrap());
@@ -120,7 +113,6 @@ public class StatusPanel extends BorderPane {
     private void initListeners() {
         mOptions.wordWrapProperty().addListener((observable, oldValue, newValue) -> {
             mLogOutPanel.setWrapText(newValue);
-            mLogErrPanel.setWrapText(newValue);
             mLogInfoPanel.setWrapText(newValue);
         });
 
@@ -130,7 +122,7 @@ public class StatusPanel extends BorderPane {
             if (newValue != null) {
                 mNameLabel.setText(newValue.getName());
                 mDescLabel.setText(newValue.getDescription());
-//                mLogInfoPanel.println(newValue.toInfoString());
+                mLogInfoPanel.println(newValue.toDebugString());
             } else {
                 mNameLabel.setText("");
                 mDescLabel.setText("");

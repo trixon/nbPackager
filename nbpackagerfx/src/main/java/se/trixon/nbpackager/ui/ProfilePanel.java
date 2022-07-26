@@ -126,6 +126,9 @@ public class ProfilePanel extends GridPane {
         mProfile.setTargetLinuxSnap(mTargetLinuxSnapCheckBox.isSelected());
         mProfile.setTargetMac(mTargetMacCheckBox.isSelected());
         mProfile.setTargetWindows(mTargetWindowsCheckBox.isSelected());
+
+        mProfile.setChecksumSha256(mSha256SumCheckBox.isSelected());
+        mProfile.setChecksumSha512(mSha512SumCheckBox.isSelected());
     }
 
     void setOkButton(Button button) {
@@ -210,8 +213,7 @@ public class ProfilePanel extends GridPane {
         mNameTextField.setPrefWidth(1000);
         mDescTextField.setPrefWidth(1000);
 
-        var rowInsets = new Insets(8, 0, 0, 0);
-        FxHelper.setPadding(rowInsets,
+        FxHelper.setPadding(new Insets(8, 0, 0, 0),
                 mSourceChooserPane,
                 mDestChooserPane,
                 mScriptPreChooserPane,
@@ -219,7 +221,10 @@ public class ProfilePanel extends GridPane {
                 mTemplateDirAppImageChooserPane,
                 mTemplateDirSnapChooserPane,
                 mResourceChooserPane,
-                jreGridPane,
+                jreGridPane
+        );
+
+        FxHelper.setPadding(new Insets(18, 0, 0, 0),
                 checkBoxBox
         );
 
@@ -231,7 +236,7 @@ public class ProfilePanel extends GridPane {
         final String text_is_required = "Text is required";
         boolean indicateRequired = true;
 
-        Predicate namePredicate = (Predicate) (Object o) -> {
+        var namePredicate = (Predicate) o -> {
             return mProfileManager.isValid(mProfile.getName(), (String) o);
         };
 
