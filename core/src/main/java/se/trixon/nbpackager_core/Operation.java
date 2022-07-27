@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2022 Patrik Karlström.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,7 @@ public class Operation {
     private final Options mOptions = Options.getInstance();
     private final Profile mProfile;
     private File mTempDir;
-    private String mVersion;
+    private final String mVersion;
 
     public Operation(Profile profile, Log log) {
         mProfile = profile;
@@ -223,6 +223,7 @@ public class Operation {
         mLog.out("\ncreate package: AppImage");
         mLog.out("copy template to: " + mDestDir.getAbsolutePath());
         String templateName = mProfile.getTemplateDirAppImage().getName();
+        templateName = StringUtils.replace(templateName, "__", String.format("_%s_", mVersion));
         var targetDir = new File(mDestDir, templateName);
         var targetFile = new File(mDestDir, StringUtils.replace(templateName, "AppDir", "AppImage"));
 
@@ -230,7 +231,7 @@ public class Operation {
             cp(mProfile.getTemplateDirAppImage(), targetDir, false);
         }
 
-        File usrDir = new File(targetDir, "usr");
+        var usrDir = new File(targetDir, "usr");
         mLog.out("copy zip contents to: " + usrDir.getAbsolutePath());
         if (!mDryRun) {
             cp(new File(mTempDir, mContentDir), usrDir, true);
@@ -239,11 +240,11 @@ public class Operation {
         removeBin(new File(usrDir, "bin"), false);
         copyJre(mProfile.getJreLinux(), usrDir);
 
-        HashMap<String, String> environment = new HashMap<>();
-        environment.put("ARCH", "x86_64");
-        ArrayList<String> command = new ArrayList<>();
+        var environment = new HashMap<String, String>();
+//        environment.put("ARCH", "x86_64");
+        var command = new ArrayList<String>();
         command.add(mOptions.get(OPT_APP_IMAGE_TOOL, "NO_COMMAND_SPECIFIED_CHECK_YOUR_SETTINGS"));
-        for (String option : StringUtils.split(mOptions.get(OPT_APP_IMAGE_OPTIONS, ""))) {
+        for (var option : StringUtils.split(mOptions.get(OPT_APP_IMAGE_OPTIONS, ""))) {
             command.add(option);
         }
 
