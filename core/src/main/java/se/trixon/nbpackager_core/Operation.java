@@ -223,7 +223,7 @@ public class Operation {
         mLog.out("\ncreate package: AppImage");
         mLog.out("copy template to: " + mDestDir.getAbsolutePath());
         String templateName = mProfile.getTemplateDirAppImage().getName();
-        templateName = StringUtils.replace(templateName, "__", String.format("_%s_", mVersion));
+        templateName = StringUtils.replace(templateName, "__", String.format("-%s-", mVersion));
         var targetDir = new File(mDestDir, templateName);
         var targetFile = new File(mDestDir, StringUtils.replace(templateName, "AppDir", "AppImage"));
 
