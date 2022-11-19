@@ -100,7 +100,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <netbeans.version>RELEASE140</netbeans.version>
+        <netbeans.version>RELEASE150</netbeans.version>
         <almond.version>17.0.0-SNAPSHOT</almond.version>
     </properties>
 </project>
