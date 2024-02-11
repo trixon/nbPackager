@@ -42,7 +42,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
+                    <version>3.12.1</version>
                     <configuration>
                         <showDeprecation>true</showDeprecation>
                         <source>17</source>
@@ -57,7 +57,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.16.1</version>
+                    <version>2.16.2</version>
                     <configuration>
                         <generateBackupPoms>false</generateBackupPoms>
                     </configuration>
@@ -107,7 +107,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <netbeans.version>RELEASE190</netbeans.version>
-        <almond.version>17.0.0-SNAPSHOT</almond.version>
+        <netbeans.version>RELEASE200</netbeans.version>
+        <almond.version>21.0.0-SNAPSHOT</almond.version>
     </properties>
 </project>
