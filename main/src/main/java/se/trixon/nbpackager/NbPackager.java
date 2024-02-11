@@ -15,10 +15,51 @@
  */
 package se.trixon.nbpackager;
 
+import java.io.IOException;
+import org.openide.util.Exceptions;
+import org.openide.windows.IOProvider;
+import se.trixon.almond.nbp.output.OutputHelper;
+import se.trixon.almond.nbp.output.OutputLineMode;
+import se.trixon.almond.util.Dict;
+import se.trixon.almond.util.GlobalState;
+import se.trixon.almond.util.SystemHelper;
+import se.trixon.almond.util.fx.FxHelper;
+
 /**
  *
  * @author Patrik Karlström <patrik@trixon.se>
  */
 public class NbPackager {
+
+    public static final String KEY_INFO = "info";
+    private static final int ICON_SIZE_TOOLBAR = 32;
+    private static final GlobalState sGlobalState = new GlobalState();
+
+    static {
+        sGlobalState.addListener(gsce -> {
+            var io = IOProvider.getDefault().getIO(Dict.INFORMATION.toString(), false);
+            var outputHelper = new OutputHelper(Dict.INFORMATION.toString(), io, false);
+
+            io.select();
+            try (var out = io.getOut()) {
+                out.reset();
+                outputHelper.println(OutputLineMode.INFO, gsce.getValue());
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }, KEY_INFO);
+    }
+
+    public static void displaySystemInformation() {
+        sGlobalState.put(KEY_INFO, SystemHelper.getSystemInfo());
+    }
+
+    public static GlobalState getGlobalState() {
+        return sGlobalState;
+    }
+
+    public static int getIconSizeToolBar() {
+        return FxHelper.getUIScaled(ICON_SIZE_TOOLBAR);
+    }
 
 }
