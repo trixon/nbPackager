@@ -15,10 +15,63 @@
  */
 package se.trixon.nbpackager.core;
 
+import com.google.gson.annotations.SerializedName;
+import java.util.UUID;
+import se.trixon.almond.util.fx.control.editable_list.EditableListItem;
+
 /**
  *
  * @author Patrik Karlström <patrik@trixon.se>
  */
-public class Task {
+public class Task implements EditableListItem {
+
+    @SerializedName("description")
+    private String mDescription;
+    @SerializedName("name")
+    private String mName;
+    @SerializedName("uuid")
+    private String mId = UUID.randomUUID().toString();
+    @SerializedName("last_run")
+    private long mLastRun;
+
+    public Task() {
+    }
+
+    public String getDescription() {
+        return mDescription;
+    }
+
+    public String getId() {
+        return mId;
+    }
+
+    public long getLastRun() {
+        return mLastRun;
+    }
+
+    @Override
+    public String getName() {
+        return mName;
+    }
+
+    public void setDescription(String description) {
+        this.mDescription = description;
+    }
+
+    public void setId(String id) {
+        this.mId = id;
+    }
+
+    public void setLastRun(long lastRun) {
+        this.mLastRun = lastRun;
+    }
+
+    public void setName(String name) {
+        mName = name;
+    }
+
+    public String toInfoString() {
+        return "TODO toInfoString";
+    }
 
 }

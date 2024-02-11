@@ -15,6 +15,7 @@
  */
 package se.trixon.nbpackager.ui;
 
+import javafx.scene.Scene;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -52,8 +53,8 @@ public final class MainTopComponent extends FxTopComponent {
 
     @Override
     protected void initFX() {
-//        var taskListEditor = new TaskListEditor();
-//        setScene(new Scene(taskListEditor.getEditableList()));
+        var taskListEditor = new TaskListEditor();
+        setScene(new Scene(taskListEditor.getEditableList()));
     }
 
     void writeProperties(java.util.Properties p) {
