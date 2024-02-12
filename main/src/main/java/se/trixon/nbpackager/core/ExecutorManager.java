@@ -44,6 +44,10 @@ public class ExecutorManager {
     }
 
     public void requestStart(Task task) {
+        var executor = new Executor(task);
+        mExecutors.put(task.getId(), executor);
+        executor.run();
+
 //        if (mInputOutput != null) {
 //            try {
 //                mInputOutput.getOut().reset();
