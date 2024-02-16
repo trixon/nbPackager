@@ -17,21 +17,22 @@ package se.trixon.nbpackager.ui;
 
 import java.util.function.Predicate;
 import javafx.application.Platform;
-import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
+import javax.swing.JFileChooser;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.openide.DialogDescriptor;
+import se.trixon.almond.nbp.Almond;
 import se.trixon.almond.util.Dict;
 import se.trixon.almond.util.fx.FxHelper;
-import se.trixon.almond.util.fx.control.FileChooserPane;
+import se.trixon.almond.util.fx.control.CheckedTab;
+import se.trixon.almond.util.fx.control.FileChooserPaneSwingFx;
 import se.trixon.nbpackager.core.StorageManager;
 import se.trixon.nbpackager.core.Task;
 import se.trixon.nbpackager.core.TaskManager;
@@ -42,30 +43,29 @@ import se.trixon.nbpackager.core.TaskManager;
  */
 public class TaskEditor extends GridPane {
 
+    private CheckedTab mAnyCheckedTab;
     private TextField mDescTextField;
-    private FileChooserPane mDestChooserPane;
+    private final FileChooserPaneSwingFx mDestChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), Dict.DESTINATION.toString(), Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY);
     private DialogDescriptor mDialogDescriptor;
-    private FileChooserPane mJreLinuxChooserPane;
-    private FileChooserPane mJreMacChooserPane;
-    private FileChooserPane mJreWindowsChooserPane;
+    private final FileChooserPaneSwingFx mJreLinuxChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), "JRE", Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY);
+    private final FileChooserPaneSwingFx mJreMacChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), "JRE", Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY);
+    private final FileChooserPaneSwingFx mJreWindowsChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), "JRE", Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY);
+    private CheckedTab mLinuxCheckedTab;
+    private CheckedTab mMacCheckedTab;
     private TextField mNameTextField;
-    private FileChooserPane mResourceChooserPane;
-    private FileChooserPane mScriptPostChooserPane;
-    private FileChooserPane mScriptPreChooserPane;
+    private final FileChooserPaneSwingFx mResourceChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), "Resource base directory", Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY);
+    private final FileChooserPaneSwingFx mScriptPostChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), "POST execution script", Almond.getFrame(), JFileChooser.FILES_ONLY);
+    private final FileChooserPaneSwingFx mScriptPreChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), "PRE execution script", Almond.getFrame(), JFileChooser.FILES_ONLY);
     private CheckBox mSha256SumCheckBox;
     private CheckBox mSha512SumCheckBox;
-    private FileChooserPane mSourceChooserPane;
-    private CheckBox mTargetAnyCheckBox;
-    private CheckBox mTargetLinuxAppImageCheckBox;
-    private CheckBox mTargetLinuxCheckBox;
-    private CheckBox mTargetLinuxSnapCheckBox;
-    private CheckBox mTargetMacCheckBox;
-    private CheckBox mTargetWindowsCheckBox;
+    private final FileChooserPaneSwingFx mSourceChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), Dict.SOURCE.toString(), Almond.getFrame(), JFileChooser.FILES_ONLY);
+    private final TabPane mTabPane = new TabPane();
     private Task mTask;
     private final TaskManager mTaskManager = TaskManager.getInstance();
-    private FileChooserPane mTemplateDirAppImageChooserPane;
-    private FileChooserPane mTemplateDirSnapChooserPane;
+    private final FileChooserPaneSwingFx mTemplateDirAppImageChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY, "AppImage template directory");
+    private final FileChooserPaneSwingFx mTemplateDirSnapChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY, "Snap template directory");
     private final ValidationSupport mValidationSupport = new ValidationSupport();
+    private CheckedTab mWindowsCheckedTab;
 
     public TaskEditor() {
         createUI();
@@ -92,12 +92,12 @@ public class TaskEditor extends GridPane {
         mTask.setJreMac(mJreMacChooserPane.getPath());
         mTask.setJreWindows(mJreWindowsChooserPane.getPath());
 
-        mTask.setTargetAny(mTargetAnyCheckBox.isSelected());
-        mTask.setTargetLinux(mTargetLinuxCheckBox.isSelected());
-        mTask.setTargetLinuxAppImage(mTargetLinuxAppImageCheckBox.isSelected());
-        mTask.setTargetLinuxSnap(mTargetLinuxSnapCheckBox.isSelected());
-        mTask.setTargetMac(mTargetMacCheckBox.isSelected());
-        mTask.setTargetWindows(mTargetWindowsCheckBox.isSelected());
+        mTask.setTargetAny(mAnyCheckedTab.getTabCheckBox().isSelected());
+        mTask.setTargetLinux(mLinuxCheckedTab.getTabCheckBox().isSelected());
+        mTask.setTargetLinuxAppImage(mTemplateDirAppImageChooserPane.getCheckBox().isSelected());
+        mTask.setTargetLinuxSnap(mTemplateDirSnapChooserPane.getCheckBox().isSelected());
+        mTask.setTargetMac(mMacCheckedTab.getTabCheckBox().isSelected());
+        mTask.setTargetWindows(mWindowsCheckedTab.getTabCheckBox().isSelected());
 
         mTask.setChecksumSha256(mSha256SumCheckBox.isSelected());
         mTask.setChecksumSha512(mSha512SumCheckBox.isSelected());
@@ -128,19 +128,21 @@ public class TaskEditor extends GridPane {
         mTemplateDirSnapChooserPane.setPath(task.getTemplateDirSnap());
         mResourceChooserPane.setPath(task.getResourceDir());
 
-        mJreLinuxChooserPane.setPath(task.getJreLinux());
-        mJreMacChooserPane.setPath(task.getJreMac());
-        mJreWindowsChooserPane.setPath(task.getJreWindows());
-
-        mTargetLinuxCheckBox.setSelected(task.isTargetLinux());
-        mTargetLinuxAppImageCheckBox.setSelected(task.isTargetLinuxAppImage());
-        mTargetLinuxSnapCheckBox.setSelected(task.isTargetLinuxSnap());
-        mTargetMacCheckBox.setSelected(task.isTargetMac());
-        mTargetWindowsCheckBox.setSelected(task.isTargetWindows());
-        mTargetAnyCheckBox.setSelected(task.isTargetAny());
-
         mSha256SumCheckBox.setSelected(task.isChecksumSha256());
         mSha512SumCheckBox.setSelected(task.isChecksumSha512());
+
+        mLinuxCheckedTab.getTabCheckBox().setSelected(task.isTargetLinux());
+        mJreLinuxChooserPane.setPath(task.getJreLinux());
+        mTemplateDirAppImageChooserPane.getCheckBox().setSelected(task.isTargetLinuxAppImage());
+        mTemplateDirSnapChooserPane.setSelected(task.isTargetLinuxSnap());
+
+        mMacCheckedTab.getTabCheckBox().setSelected(task.isTargetMac());
+        mJreMacChooserPane.setPath(task.getJreMac());
+
+        mWindowsCheckedTab.getTabCheckBox().setSelected(task.isTargetWindows());
+        mJreWindowsChooserPane.setPath(task.getJreWindows());
+
+        mAnyCheckedTab.getTabCheckBox().setSelected(task.isTargetAny());
 
         mNameTextField.requestFocus();
     }
@@ -153,42 +155,36 @@ public class TaskEditor extends GridPane {
 
         mNameTextField = new TextField();
         mDescTextField = new TextField();
-        mSourceChooserPane = new FileChooserPane(Dict.SELECT.toString(), Dict.SOURCE.toString(), FileChooserPane.ObjectMode.DIRECTORY, SelectionMode.SINGLE);
-        mDestChooserPane = new FileChooserPane(Dict.SELECT.toString(), Dict.DESTINATION.toString(), FileChooserPane.ObjectMode.DIRECTORY, SelectionMode.SINGLE);
-        mScriptPreChooserPane = new FileChooserPane(Dict.SELECT.toString(), "PRE execution script", FileChooserPane.ObjectMode.FILE, SelectionMode.SINGLE);
-        mScriptPostChooserPane = new FileChooserPane(Dict.SELECT.toString(), "POST execution script", FileChooserPane.ObjectMode.FILE, SelectionMode.SINGLE);
-        mTemplateDirAppImageChooserPane = new FileChooserPane(Dict.SELECT.toString(), "AppImage template directory", FileChooserPane.ObjectMode.DIRECTORY, SelectionMode.SINGLE);
-        mTemplateDirSnapChooserPane = new FileChooserPane(Dict.SELECT.toString(), "Snap template directory", FileChooserPane.ObjectMode.DIRECTORY, SelectionMode.SINGLE);
-        mResourceChooserPane = new FileChooserPane(Dict.SELECT.toString(), "Resource base directory", FileChooserPane.ObjectMode.DIRECTORY, SelectionMode.SINGLE);
-
-        mJreLinuxChooserPane = new FileChooserPane(Dict.SELECT.toString(), "Linux JRE", FileChooserPane.ObjectMode.DIRECTORY, SelectionMode.SINGLE);
-        mJreMacChooserPane = new FileChooserPane(Dict.SELECT.toString(), "Mac JRE", FileChooserPane.ObjectMode.DIRECTORY, SelectionMode.SINGLE);
-        mJreWindowsChooserPane = new FileChooserPane(Dict.SELECT.toString(), "Windows JRE", FileChooserPane.ObjectMode.DIRECTORY, SelectionMode.SINGLE);
-
-        mTargetLinuxCheckBox = new CheckBox("Linux");
-        mTargetLinuxAppImageCheckBox = new CheckBox("AppImage");
-        mTargetLinuxSnapCheckBox = new CheckBox("Snap");
-        mTargetMacCheckBox = new CheckBox("Mac");
-        mTargetWindowsCheckBox = new CheckBox("Windows");
-        mTargetAnyCheckBox = new CheckBox("Any (without JRE)");
-
-        var spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
 
         mSha256SumCheckBox = new CheckBox("sha256sum");
         mSha512SumCheckBox = new CheckBox("sha512sum");
 
-        var checkBoxBox = new HBox(8,
-                mTargetLinuxCheckBox,
-                mTargetLinuxAppImageCheckBox,
-                mTargetLinuxSnapCheckBox,
-                mTargetMacCheckBox,
-                mTargetWindowsCheckBox,
-                mTargetAnyCheckBox,
-                spacer,
+        var linuxGridPane = new GridPane(FxHelper.getUIScaled(2), FxHelper.getUIScaled(8));
+        linuxGridPane.add(mJreLinuxChooserPane, 0, 0, GridPane.REMAINING, 1);
+        linuxGridPane.add(mTemplateDirAppImageChooserPane, 0, 1, 1, 1);
+        linuxGridPane.add(mTemplateDirSnapChooserPane, 1, 1, 1, 1);
+        FxHelper.autoSizeColumn(linuxGridPane, 2);
+
+        mLinuxCheckedTab = new CheckedTab("Linux", linuxGridPane, null, null);
+        var macGridPane = new GridPane(FxHelper.getUIScaled(2), FxHelper.getUIScaled(8));
+        macGridPane.addColumn(0, mJreMacChooserPane);
+        mMacCheckedTab = new CheckedTab("Mac", macGridPane, null, null);
+
+        var windowsGridPane = new GridPane(FxHelper.getUIScaled(2), FxHelper.getUIScaled(8));
+        windowsGridPane.addColumn(0, mJreWindowsChooserPane);
+        mWindowsCheckedTab = new CheckedTab("Windows", windowsGridPane, null, null);
+
+        mAnyCheckedTab = new CheckedTab("Any (without JRE)", null, null, null);
+
+        mTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        mTabPane.getTabs().setAll(mLinuxCheckedTab, mMacCheckedTab, mWindowsCheckedTab, mAnyCheckedTab);
+
+        var checkBoxBox = new HBox(FxHelper.getUIScaled(8),
                 mSha256SumCheckBox,
                 mSha512SumCheckBox
         );
+        checkBoxBox.setAlignment(Pos.BOTTOM_RIGHT);
+        checkBoxBox.setPadding(FxHelper.getUIScaledInsets(0, 0, 8, 0));
 
         int row = 0;
         addRow(row++, nameLabel, descLabel);
@@ -197,49 +193,33 @@ public class TaskEditor extends GridPane {
         add(mDestChooserPane, 1, row, 1, 1);
         add(mScriptPreChooserPane, 0, ++row, 1, 1);
         add(mScriptPostChooserPane, 1, row, 1, 1);
-        add(mTemplateDirAppImageChooserPane, 0, ++row, 1, 1);
-        add(mTemplateDirSnapChooserPane, 1, row, 1, 1);
         add(mResourceChooserPane, 0, ++row, 1, 1);
+        add(checkBoxBox, 1, row, 1, 1);
+        add(mTabPane, 0, ++row, GridPane.REMAINING, 1);
 
-        var jreGridPane = new GridPane();
-        jreGridPane.setHgap(8);
-        jreGridPane.addRow(0, mJreLinuxChooserPane, mJreMacChooserPane, mJreWindowsChooserPane);
-
-        add(jreGridPane, 0, ++row, GridPane.REMAINING, 1);
-        add(checkBoxBox, 0, ++row, GridPane.REMAINING, 1);
-
-        GridPane.setHgrow(mNameTextField, Priority.ALWAYS);
-        GridPane.setHgrow(mDescTextField, Priority.ALWAYS);
-        GridPane.setHgrow(mJreLinuxChooserPane, Priority.ALWAYS);
-        GridPane.setHgrow(mJreMacChooserPane, Priority.ALWAYS);
-        GridPane.setHgrow(mJreWindowsChooserPane, Priority.ALWAYS);
-
-        GridPane.setFillWidth(mNameTextField, true);
-        GridPane.setFillWidth(mDescTextField, true);
-        GridPane.setFillWidth(mJreLinuxChooserPane, true);
-        GridPane.setFillWidth(mJreMacChooserPane, true);
-        GridPane.setFillWidth(mJreWindowsChooserPane, true);
-
+        FxHelper.autoSizeRegionHorizontal(
+                mNameTextField,
+                mDescTextField,
+                mJreLinuxChooserPane,
+                mJreMacChooserPane,
+                mJreWindowsChooserPane
+        );
         mNameTextField.setPrefWidth(1000);
         mDescTextField.setPrefWidth(1000);
 
-        FxHelper.setPadding(new Insets(8, 0, 0, 0),
+        FxHelper.setPadding(FxHelper.getUIScaledInsets(8, 0, 0, 0),
                 mSourceChooserPane,
                 mDestChooserPane,
                 mScriptPreChooserPane,
                 mScriptPostChooserPane,
                 mTemplateDirAppImageChooserPane,
                 mTemplateDirSnapChooserPane,
-                mResourceChooserPane,
-                jreGridPane
+                mResourceChooserPane
         );
 
-        FxHelper.setPadding(new Insets(18, 0, 0, 0),
-                checkBoxBox
+        FxHelper.setPadding(FxHelper.getUIScaledInsets(18, 0, 0, 0),
+                mTabPane
         );
-
-        mTargetLinuxAppImageCheckBox.disableProperty().bind(mTargetLinuxCheckBox.selectedProperty().not());
-        mTargetLinuxSnapCheckBox.disableProperty().bind(mTargetLinuxCheckBox.selectedProperty().not());
     }
 
     private void initValidation() {
