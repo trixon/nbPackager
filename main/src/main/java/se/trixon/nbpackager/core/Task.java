@@ -372,8 +372,8 @@ public class Task implements EditableListItem {
         mTemplateDirSnap = templateDirSnap;
     }
 
-    public String toDebugString() {
-        LinkedHashMap<String, String> values = new LinkedHashMap<>();
+    public String toInfoString() {
+        var values = new LinkedHashMap<String, String>();
         values.put("Source", fileToString(mSourceDir));
         values.put("Destination", fileToString(mDestDir));
         values.put("PRE execution", fileToString(mScriptPre));
@@ -405,19 +405,15 @@ public class Task implements EditableListItem {
         }
         maxLength += 1;
 
-        String separator = " : ";
-        StringBuilder builder = new StringBuilder();
+        var separator = " : ";
+        var builder = new StringBuilder();
         for (var entry : values.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
+            var key = entry.getKey();
+            var value = entry.getValue();
             builder.append(StringUtils.rightPad(key, maxLength)).append(separator).append(value).append("\n");
         }
 
         return builder.toString();
-    }
-
-    public String toInfoString() {
-        return "TODO toInfoString";
     }
 
     private void addValidationError(String string) {

@@ -31,6 +31,16 @@ import org.apache.commons.codec.digest.MessageDigestAlgorithms;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.netbeans.api.progress.ProgressHandle;
+import org.openide.awt.StatusDisplayer;
+import org.openide.util.Cancellable;
+import org.openide.windows.FoldHandle;
+import org.openide.windows.IOFolding;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
+import se.trixon.almond.nbp.output.OutputHelper;
+import se.trixon.almond.nbp.output.OutputLineMode;
+import se.trixon.almond.util.Dict;
 import se.trixon.almond.util.Log;
 import se.trixon.almond.util.ProcessLogThread;
 import se.trixon.nbpackager.Options;
@@ -42,14 +52,83 @@ import static se.trixon.nbpackager.Options.*;
  */
 public class Executor implements Runnable {
 
+    private final boolean mDryRun;
+    private String mDryRunIndicator = "";
+    private Thread mExecutorThread;
+    private final InputOutput mInputOutput;
+    private boolean mInterrupted;
+    private FoldHandle mMainFoldHandle;
     private final Options mOptions = Options.getInstance();
+    private final OutputHelper mOutputHelper;
+    private ProgressHandle mProgressHandle;
+    private final StatusDisplayer mStatusDisplayer = StatusDisplayer.getDefault();
+    private final Task mTask;
 
-    public Executor(Task task) {
+    public Executor(Task task, boolean dryRun) {
+        mTask = task;
+        mDryRun = dryRun;
+        mInputOutput = IOProvider.getDefault().getIO(mTask.getName(), false);
+        mInputOutput.select();
+
+        if (mDryRun) {
+            mDryRunIndicator = String.format(" (%s)", Dict.DRY_RUN.toString());
+        }
+
+        mOutputHelper = new OutputHelper(mTask.getName(), mInputOutput, mDryRun);
+        mOutputHelper.reset();
     }
 
     @Override
     public void run() {
-        System.out.println("RUN");
+        var allowToCancel = (Cancellable) () -> {
+            mExecutorThread.interrupt();
+            mInterrupted = true;
+            mProgressHandle.finish();
+            ExecutorManager.getInstance().getExecutors().remove(mTask.getId());
+            jobEnded(OutputLineMode.WARNING, Dict.CANCELED.toString());
+
+            return true;
+        };
+
+        mProgressHandle = ProgressHandle.createHandle(mTask.getName(), allowToCancel);
+        mProgressHandle.start();
+        mProgressHandle.switchToIndeterminate();
+
+        mExecutorThread = new Thread(() -> {
+            mOutputHelper.start();
+            mOutputHelper.printSectionHeader(OutputLineMode.INFO, Dict.START.toString(), Dict.TASK.toLower(), mTask.getName());
+            mMainFoldHandle = IOFolding.startFold(mInputOutput, true);
+
+            if (!mTask.isValid()) {
+                mInputOutput.getErr().println(mTask.getValidationError());
+                jobEnded(OutputLineMode.ERROR, Dict.INVALID_INPUT.toString());
+                mInputOutput.getErr().println(String.format("\n\n%s", Dict.JOB_FAILED.toString()));
+
+                return;
+            }
+//DO WORK HERE
+            if (!mInterrupted) {
+                jobEnded(OutputLineMode.OK, Dict.DONE.toString());
+
+                if (!mDryRun) {
+                    mTask.setLastRun(System.currentTimeMillis());
+                    StorageManager.save();
+                }
+            }
+
+            mProgressHandle.finish();
+            ExecutorManager.getInstance().getExecutors().remove(mTask.getId());
+        }, "Executor");
+
+        mExecutorThread.start();
+    }
+
+    private void jobEnded(OutputLineMode outputLineMode, String action) {
+        mProgressHandle.finish();
+        mMainFoldHandle.silentFinish();
+        mStatusDisplayer.setStatusText(action);
+        mOutputHelper.printSummary(outputLineMode, action, Dict.TASK.toString());
+        ExecutorManager.getInstance().getExecutors().remove(mTask.getId());
     }
 
     class Operation {
@@ -57,7 +136,6 @@ public class Executor implements Runnable {
         private String mContentDir = "NOT_AVAILABLE_IN_DRY_RUN";
         private Process mCurrentProcess;
         private File mDestDir;
-        private final boolean mDryRun;
         private boolean mInterrupted;
         private File mLinuxTargetFile;
         private final Log mLog;
@@ -68,7 +146,6 @@ public class Executor implements Runnable {
         public Operation(Task profile, Log log) {
             mTask = profile;
             mLog = log;
-            mDryRun = mTask.isDryRun();
 
             mVersion = StringUtils.substringAfter(mTask.getBasename(), "-");
         }

@@ -58,7 +58,7 @@ public class TaskEditor extends GridPane {
     private final FileChooserPaneSwingFx mScriptPreChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), "PRE execution script", Almond.getFrame(), JFileChooser.FILES_ONLY);
     private CheckBox mSha256SumCheckBox;
     private CheckBox mSha512SumCheckBox;
-    private final FileChooserPaneSwingFx mSourceChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), Dict.SOURCE.toString(), Almond.getFrame(), JFileChooser.FILES_ONLY);
+    private final FileChooserPaneSwingFx mSourceChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), Dict.SOURCE.toString(), Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY);
     private final TabPane mTabPane = new TabPane();
     private Task mTask;
     private final TaskManager mTaskManager = TaskManager.getInstance();

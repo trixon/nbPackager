@@ -16,10 +16,14 @@
 package se.trixon.nbpackager.core;
 
 import java.util.HashMap;
-import java.util.ResourceBundle;
-import org.openide.util.NbBundle;
-import org.openide.windows.IOProvider;
-import org.openide.windows.InputOutput;
+import javax.swing.JButton;
+import javax.swing.SwingUtilities;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
+import se.trixon.almond.nbp.dialogs.NbMessage;
+import se.trixon.almond.util.Dict;
+import se.trixon.almond.util.swing.LogPanel;
+import se.trixon.almond.util.swing.SwingHelper;
 
 /**
  *
@@ -27,10 +31,7 @@ import org.openide.windows.InputOutput;
  */
 public class ExecutorManager {
 
-    private final ResourceBundle mBundle = NbBundle.getBundle(ExecutorManager.class);
     private final HashMap<String, Executor> mExecutors = new HashMap<>();
-    private InputOutput mInputOutput;
-    private boolean mNoErrors = true;
 
     public static ExecutorManager getInstance() {
         return Holder.INSTANCE;
@@ -44,69 +45,44 @@ public class ExecutorManager {
     }
 
     public void requestStart(Task task) {
-        var executor = new Executor(task);
-        mExecutors.put(task.getId(), executor);
-        executor.run();
+        if (mExecutors.containsKey(task.getId())) {
+            NbMessage.error(Dict.Dialog.TITLE_TASK_RUNNING.toString(), Dict.Dialog.MESSAGE_TASK_RUNNING.toString());
+        } else {
+            var logPanel = new LogPanel();
+            logPanel.println(task.toInfoString());
+            logPanel.setPreferredSize(SwingHelper.getUIScaledDim(640, 480));
 
-//        if (mInputOutput != null) {
-//            try {
-//                mInputOutput.getOut().reset();
-//            } catch (IOException ex) {
-//                Exceptions.printStackTrace(ex);
-//            }
-//        }
-//
-//        var filter = new FileNameExtensionFilter("Keyhole Markup Language (*.kml)", "kml");
-//        SimpleDialog.clearFilters();
-//        SimpleDialog.addFilter(filter);
-//        SimpleDialog.setFilter(filter);
-//        SimpleDialog.setParent(Almond.getFrame());
-//        SimpleDialog.setTitle(String.format("%s %s", Dict.SAVE.toString(), task.getName()));
-//
-//        var destination = task.getDestinationFile();
-//        if (destination == null) {
-//            SimpleDialog.setPath(FileUtils.getUserDirectory());
-//        } else {
-//            SimpleDialog.setPath(destination.getParentFile());
-//            SimpleDialog.setSelectedFile(destination);
-//        }
-//
-//        if (SimpleDialog.saveFile()) {
-//            var file = SimpleDialog.getPath();
-//            task.setDestinationFile(file);
-//
-//            mNoErrors = task.isValid();
-//            if (!mNoErrors) {
-//                printErr(task, task.getValidationError());
-//            }
-//
-//            if (!Files.isWritable(file.getParentFile().toPath())) {
-//                printErr(task, mBundle.getString("insufficient_privileges").formatted(file.getAbsolutePath()));
-//            }
-//
-//            if (!task.hasValidRelativeSourceDest()) {
-//                printErr(task, mBundle.getString("invalid_relative_source_dest"));
-//            }
-//
-//            if (mNoErrors) {
-//                var executor = new Executor(task);
-//                mExecutors.put(task.getId(), executor);
-//                executor.run();
-//            } else {
-//                printErr(task, Dict.ABORTING.toString());
-//            }
-//        }
+            SwingUtilities.invokeLater(() -> {
+                var title = Dict.Dialog.TITLE_TASK_RUN_S.toString().formatted(task.getName());
+                var dryRunButton = new JButton(Dict.DRY_RUN.toString());
+                var d = new DialogDescriptor(
+                        logPanel,
+                        title,
+                        true,
+                        new Object[]{Dict.CANCEL.toString(), Dict.RUN.toString(), dryRunButton},
+                        dryRunButton,
+                        0,
+                        null,
+                        null
+                );
+
+                d.setValid(false);
+                SwingHelper.runLaterDelayed(100, () -> dryRunButton.requestFocus());
+                var result = DialogDisplayer.getDefault().notify(d);
+
+                if (result == Dict.RUN.toString()) {
+                    start(task, false);
+                } else if (result == dryRunButton) {
+                    start(task, true);
+                }
+            });
+        }
     }
 
-    private void printErr(Task task, String s) {
-        if (mInputOutput == null) {
-            mInputOutput = IOProvider.getDefault().getIO(task.getName(), false);
-            mInputOutput.select();
-        }
-
-        mInputOutput.getErr().println(s);
-
-        mNoErrors = false;
+    public void start(Task task, boolean dryRun) {
+        var executor = new Executor(task, dryRun);
+        mExecutors.put(task.getId(), executor);
+        executor.run();
     }
 
     private static class Holder {
