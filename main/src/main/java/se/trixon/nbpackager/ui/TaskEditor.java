@@ -53,7 +53,7 @@ public class TaskEditor extends GridPane {
     private CheckedTab mLinuxCheckedTab;
     private CheckedTab mMacCheckedTab;
     private TextField mNameTextField;
-    private final FileChooserPaneSwingFx mResourceChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), "Resource base directory", Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY);
+    private final FileChooserPaneSwingFx mResourceChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY, "Resource base directory");
     private final FileChooserPaneSwingFx mScriptPostChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), Almond.getFrame(), JFileChooser.FILES_ONLY, "POST execution script");
     private final FileChooserPaneSwingFx mScriptPreChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), Almond.getFrame(), JFileChooser.FILES_ONLY, "PRE execution script");
     private CheckBox mSha256SumCheckBox;
@@ -88,6 +88,7 @@ public class TaskEditor extends GridPane {
         mTask.setScriptPost(mScriptPostChooserPane.getPath());
         mTask.setTemplateDirAppImage(mTemplateDirAppImageChooserPane.getPath());
         mTask.setTemplateDirSnap(mTemplateDirSnapChooserPane.getPath());
+        mTask.setExecuteResources(mResourceChooserPane.getCheckBox().isSelected());
         mTask.setResourceDir(mResourceChooserPane.getPath());
 
         mTask.setJreLinux(mJreLinuxChooserPane.getPath());
@@ -130,6 +131,7 @@ public class TaskEditor extends GridPane {
 
         mTemplateDirAppImageChooserPane.setPath(task.getTemplateDirAppImage());
         mTemplateDirSnapChooserPane.setPath(task.getTemplateDirSnap());
+        mResourceChooserPane.getCheckBox().setSelected(task.isExecuteResources());
         mResourceChooserPane.setPath(task.getResourceDir());
 
         mSha256SumCheckBox.setSelected(task.isChecksumSha256());

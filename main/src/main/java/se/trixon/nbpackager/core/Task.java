@@ -43,6 +43,8 @@ public class Task implements EditableListItem {
     private String mDescription;
     @SerializedName("destDir")
     private File mDestDir;
+    @SerializedName("executeResources")
+    private boolean mExecuteResources;
     @SerializedName("executeScriptPost")
     private boolean mExecuteScriptPost;
     @SerializedName("executeScriptPre")
@@ -165,6 +167,10 @@ public class Task implements EditableListItem {
 
     public boolean isChecksumSha512() {
         return mChecksumSha512;
+    }
+
+    public boolean isExecuteResources() {
+        return mExecuteResources;
     }
 
     public boolean isExecuteScriptPost() {
@@ -301,6 +307,10 @@ public class Task implements EditableListItem {
 
     public void setDestDir(File destDir) {
         mDestDir = destDir;
+    }
+
+    public void setExecuteResources(boolean executeResources) {
+        mExecuteResources = executeResources;
     }
 
     public void setExecuteScriptPost(boolean executeScriptPost) {

@@ -36,6 +36,7 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.Cancellable;
+import org.openide.util.Exceptions;
 import org.openide.windows.FoldHandle;
 import org.openide.windows.IOFolding;
 import org.openide.windows.IOProvider;
@@ -204,12 +205,15 @@ public class Executor implements Runnable {
     }
 
     private void cp(File source, File dest, boolean contentOnly) {
-        var sourcePath = source.getAbsolutePath();
-        if (contentOnly && source.isDirectory()) {
-            sourcePath += "/.";
+        try {
+            if (source.isFile()) {
+                FileUtils.copyFile(source, dest, true);
+            } else if (source.isDirectory()) {
+                FileUtils.copyDirectory(source, dest, true);
+            }
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
-        execute(null, null, "cp", "-ra", sourcePath, dest.getAbsolutePath());
-        //FileUtils.copyDirectory(source, dest, true);
     }
 
     private void createChecksum(File file, String algorithm) throws IOException {
@@ -242,14 +246,13 @@ public class Executor implements Runnable {
             cp(mTempDir, targetDir, true);
         }
 
-        var baseDir = mTask.getResourceDir();
         targetDir = new File(targetDir, mContentDir);
-        if (baseDir != null) {
+        if (mTask.isExecuteResources() && mTask.getResourceDir() != null && mTask.getResourceDir().isDirectory()) {
             mInputOutput.getOut().println("copy resources to: " + targetDir.getAbsolutePath());
             if (!mDryRun) {
-                cp(new File(baseDir, "any"), targetDir, true);
+                cp(new File(mTask.getResourceDir(), "any"), targetDir, true);
                 if (!"any".equals(target)) {
-                    cp(new File(baseDir, target), targetDir, true);
+                    cp(new File(mTask.getResourceDir(), target), targetDir, true);
                 }
             }
         }

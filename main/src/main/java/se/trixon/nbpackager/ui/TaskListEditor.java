@@ -60,8 +60,7 @@ public class TaskListEditor {
                 setScene(new Scene(mTaskEditor));
             }
         };
-
-        mDialogPanel.setPreferredSize(SwingHelper.getUIScaledDim(700, 480));
+        mDialogPanel.setPreferredSize(SwingHelper.getUIScaledDim(900, 480));
         mDialogPanel.initFx();
     }
 
