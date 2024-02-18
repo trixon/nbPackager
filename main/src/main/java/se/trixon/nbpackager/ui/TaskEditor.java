@@ -54,8 +54,8 @@ public class TaskEditor extends GridPane {
     private CheckedTab mMacCheckedTab;
     private TextField mNameTextField;
     private final FileChooserPaneSwingFx mResourceChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), "Resource base directory", Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY);
-    private final FileChooserPaneSwingFx mScriptPostChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), "POST execution script", Almond.getFrame(), JFileChooser.FILES_ONLY);
-    private final FileChooserPaneSwingFx mScriptPreChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), "PRE execution script", Almond.getFrame(), JFileChooser.FILES_ONLY);
+    private final FileChooserPaneSwingFx mScriptPostChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), Almond.getFrame(), JFileChooser.FILES_ONLY, "POST execution script");
+    private final FileChooserPaneSwingFx mScriptPreChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), Almond.getFrame(), JFileChooser.FILES_ONLY, "PRE execution script");
     private CheckBox mSha256SumCheckBox;
     private CheckBox mSha512SumCheckBox;
     private final FileChooserPaneSwingFx mSourceChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), Dict.SOURCE.toString(), Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY);
@@ -82,7 +82,9 @@ public class TaskEditor extends GridPane {
         mTask.setDescription(mDescTextField.getText());
         mTask.setSourceDir(mSourceChooserPane.getPath());
         mTask.setDestDir(mDestChooserPane.getPath());
+        mTask.setExecuteScriptPre(mScriptPreChooserPane.getCheckBox().isSelected());
         mTask.setScriptPre(mScriptPreChooserPane.getPath());
+        mTask.setExecuteScriptPost(mScriptPostChooserPane.getCheckBox().isSelected());
         mTask.setScriptPost(mScriptPostChooserPane.getPath());
         mTask.setTemplateDirAppImage(mTemplateDirAppImageChooserPane.getPath());
         mTask.setTemplateDirSnap(mTemplateDirSnapChooserPane.getPath());
@@ -121,7 +123,9 @@ public class TaskEditor extends GridPane {
         mSourceChooserPane.setPath(task.getSourceDir());
         mDestChooserPane.setPath(task.getDestDir());
 
+        mScriptPreChooserPane.getCheckBox().setSelected(task.isExecuteScriptPre());
         mScriptPreChooserPane.setPath(task.getScriptPre());
+        mScriptPostChooserPane.getCheckBox().setSelected(task.isExecuteScriptPost());
         mScriptPostChooserPane.setPath(task.getScriptPost());
 
         mTemplateDirAppImageChooserPane.setPath(task.getTemplateDirAppImage());

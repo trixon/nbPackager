@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.codec.digest.MessageDigestAlgorithms;
 import org.apache.commons.io.FileUtils;
@@ -108,7 +109,7 @@ public class Executor implements Runnable {
             if (!mTask.isValid()) {
                 mInputOutput.getErr().println(mTask.getValidationError());
                 jobEnded(OutputLineMode.ERROR, Dict.INVALID_INPUT.toString());
-                mInputOutput.getErr().println(String.format("\n\n%s", Dict.JOB_FAILED.toString()));
+                mInputOutput.getErr().println(String.format("\n\n%s", Dict.TASKS_FAILED.toString()));
 
                 return;
             }
@@ -122,7 +123,7 @@ public class Executor implements Runnable {
                     }
                 }
 
-                if (!mInterrupted && mTask.getScriptPre() != null) {
+                if (!mInterrupted && mTask.isExecuteScriptPre() && mTask.getScriptPre() != null && mTask.getScriptPre().isFile()) {
                     mInputOutput.getOut().println("Run PRE execution script");
                     executeScript(null, null, mTask.getScriptPre());
                 }
@@ -155,7 +156,7 @@ public class Executor implements Runnable {
                     createPackage("windows");
                 }
 
-                if (!mInterrupted && mTask.getScriptPost() != null) {
+                if (!mInterrupted && mTask.isExecuteScriptPost() && mTask.getScriptPost() != null && mTask.getScriptPost().isFile()) {
                     mInputOutput.getOut().println("Run POST execution script");
                     executeScript(null, null, mTask.getScriptPost());
                 }
@@ -163,13 +164,8 @@ public class Executor implements Runnable {
                 if (mTempDir != null) {
                     FileUtils.deleteDirectory(mTempDir);
                 }
-
-                if (mInterrupted) {
-                    mInputOutput.getErr().println("\nOperation interrupted");
-                }
             } catch (IOException e) {
-                mInputOutput.getErr().println(e.getMessage());
-                System.out.println("PAUSE");
+                System.err.println(e);
             }
 
             if (!mInterrupted) {
@@ -284,7 +280,10 @@ public class Executor implements Runnable {
         }
 
         mInputOutput.getOut().println("creating zip: " + targetFile.getAbsolutePath());
-        execute(null, targetDir.getParentFile(), "zip", "-qr", targetFile.getAbsolutePath(), contentDir);
+        var zipParameters = new ZipParameters();
+        zipParameters.setIncludeRootFolder(false);
+        var zipFile = new ZipFile(targetFile);
+        zipFile.addFolder(targetDir, zipParameters);
 
         createChecksums(targetFile);
     }
@@ -466,8 +465,8 @@ public class Executor implements Runnable {
         mTempDir.deleteOnExit();
         mInputOutput.getOut().println("create temp dir: " + mTempDir.getAbsolutePath());
         mInputOutput.getOut().println("unzip: " + mTask.getSourceFile());
+
         if (!mDryRun) {
-            //execute(null, "unzip", "-q", mTask.getSourceFile().getAbsolutePath(), "-d", mTempDir.getAbsolutePath());
             new ZipFile(mTask.getSourceFile()).extractAll(mTempDir.getAbsolutePath());
             mContentDir = mTempDir.list()[0];
         }

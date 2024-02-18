@@ -43,7 +43,10 @@ public class Task implements EditableListItem {
     private String mDescription;
     @SerializedName("destDir")
     private File mDestDir;
-    private transient boolean mDryRun;
+    @SerializedName("executeScriptPost")
+    private boolean mExecuteScriptPost;
+    @SerializedName("executeScriptPre")
+    private boolean mExecuteScriptPre;
     @SerializedName("uuid")
     private String mId = UUID.randomUUID().toString();
     @SerializedName("jreLinux")
@@ -164,8 +167,12 @@ public class Task implements EditableListItem {
         return mChecksumSha512;
     }
 
-    public boolean isDryRun() {
-        return mDryRun;
+    public boolean isExecuteScriptPost() {
+        return mExecuteScriptPost;
+    }
+
+    public boolean isExecuteScriptPre() {
+        return mExecuteScriptPre;
     }
 
     public boolean isTargetAny() {
@@ -289,19 +296,23 @@ public class Task implements EditableListItem {
     }
 
     public void setDescription(String description) {
-        this.mDescription = description;
+        mDescription = description;
     }
 
     public void setDestDir(File destDir) {
         mDestDir = destDir;
     }
 
-    public void setDryRun(boolean dryRun) {
-        mDryRun = dryRun;
+    public void setExecuteScriptPost(boolean executeScriptPost) {
+        mExecuteScriptPost = executeScriptPost;
+    }
+
+    public void setExecuteScriptPre(boolean executeScriptPre) {
+        mExecuteScriptPre = executeScriptPre;
     }
 
     public void setId(String id) {
-        this.mId = id;
+        mId = id;
     }
 
     public void setJreLinux(File jreLinux) {
@@ -317,7 +328,7 @@ public class Task implements EditableListItem {
     }
 
     public void setLastRun(long lastRun) {
-        this.mLastRun = lastRun;
+        mLastRun = lastRun;
     }
 
     public void setName(String name) {
