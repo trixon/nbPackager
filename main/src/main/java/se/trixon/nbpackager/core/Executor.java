@@ -69,7 +69,7 @@ public class Executor implements Runnable {
     private final StatusDisplayer mStatusDisplayer = StatusDisplayer.getDefault();
     private final Task mTask;
     private File mTempDir;
-    private final String mVersion;
+    private String mVersion;
 
     public Executor(Task task, boolean dryRun) {
         mTask = task;
@@ -83,7 +83,6 @@ public class Executor implements Runnable {
 
         mOutputHelper = new OutputHelper(mTask.getName(), mInputOutput, mDryRun);
         mOutputHelper.reset();
-        mVersion = StringUtils.substringAfter(mTask.getBasename(), "-");
     }
 
     @Override
@@ -116,6 +115,7 @@ public class Executor implements Runnable {
             }
 
             try {
+                mVersion = StringUtils.substringAfter(mTask.getBasename(), "-");
                 mDestDir = new File(mTask.getDestDir(), FilenameUtils.getBaseName(mTask.getSourceFile().getName()));
 
                 if (!mDryRun) {
