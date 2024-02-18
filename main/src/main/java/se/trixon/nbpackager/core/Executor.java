@@ -31,6 +31,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.netbeans.api.progress.ProgressHandle;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.Cancellable;
 import org.openide.windows.FoldHandle;
@@ -116,12 +118,11 @@ public class Executor implements Runnable {
 
                 if (!mDryRun) {
                     if (!initTargetDirectory()) {
-                        mInputOutput.getErr().println("\nOperation cancelled");
-                        return;
+                        jobEnded(OutputLineMode.WARNING, Dict.CANCELED.toString());
                     }
                 }
 
-                if (mTask.getScriptPre() != null) {
+                if (!mInterrupted && mTask.getScriptPre() != null) {
                     mInputOutput.getOut().println("Run PRE execution script");
                     executeScript(null, null, mTask.getScriptPre());
                 }
@@ -159,15 +160,16 @@ public class Executor implements Runnable {
                     executeScript(null, null, mTask.getScriptPost());
                 }
 
-                FileUtils.deleteDirectory(mTempDir);
+                if (mTempDir != null) {
+                    FileUtils.deleteDirectory(mTempDir);
+                }
 
                 if (mInterrupted) {
                     mInputOutput.getErr().println("\nOperation interrupted");
-                } else {
-                    mInputOutput.getOut().println("\nOperation completed" + (mDryRun ? " (dry-run)" : ""));
                 }
             } catch (IOException e) {
-//TODO
+                mInputOutput.getErr().println(e.getMessage());
+                System.out.println("PAUSE");
             }
 
             if (!mInterrupted) {
@@ -410,13 +412,21 @@ public class Executor implements Runnable {
         if (!mDestDir.exists()) {
             FileUtils.forceMkdir(mDestDir);
         } else {
-            //TODO Implement confirmation dialog
-            result = true;
-//                result = MainPanel.getDialogListener().onDialogRequest("Clear existing directory?", String.format("Clear\n%s\nand continue?", mDestDir.getAbsolutePath()));
+            NotifyDescriptor d = new NotifyDescriptor(
+                    "Clear\n%s\nand continue?".formatted(mDestDir.getAbsolutePath()),
+                    "Clear existing directory?",
+                    NotifyDescriptor.OK_CANCEL_OPTION, // option type
+                    NotifyDescriptor.INFORMATION_MESSAGE, // message type
+                    null, // own buttons as Object[]
+                    null); // initial value
+            var retval = DialogDisplayer.getDefault().notify(d);
+            result = retval == NotifyDescriptor.OK_OPTION;
+
             if (result) {
-                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-//                    FileUtils.deleteQuietly(mDestDir);
-//                    FileUtils.forceMkdir(mDestDir);
+                FileUtils.deleteQuietly(mDestDir);
+                FileUtils.forceMkdir(mDestDir);
+            } else {
+                mInterrupted = true;
             }
         }
 
