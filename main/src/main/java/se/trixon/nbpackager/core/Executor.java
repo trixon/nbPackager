@@ -30,6 +30,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.codec.digest.MessageDigestAlgorithms;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.DialogDisplayer;
@@ -57,7 +58,6 @@ public class Executor implements Runnable {
     private Process mCurrentProcess;
     private File mDestDir;
     private final boolean mDryRun;
-    private String mDryRunIndicator = "";
     private Thread mExecutorThread;
     private final InputOutput mInputOutput;
     private boolean mInterrupted;
@@ -76,10 +76,6 @@ public class Executor implements Runnable {
         mDryRun = dryRun;
         mInputOutput = IOProvider.getDefault().getIO(mTask.getName(), false);
         mInputOutput.select();
-
-        if (mDryRun) {
-            mDryRunIndicator = String.format(" (%s)", Dict.DRY_RUN.toString());
-        }
 
         mOutputHelper = new OutputHelper(mTask.getName(), mInputOutput, mDryRun);
         mOutputHelper.reset();
@@ -207,7 +203,11 @@ public class Executor implements Runnable {
     private void cp(File source, File dest, boolean contentOnly) {
         try {
             if (source.isFile()) {
-                FileUtils.copyFile(source, dest, true);
+                if (dest.isFile()) {
+                    FileUtils.copyFile(source, dest, true);
+                } else if (dest.isDirectory()) {
+                    FileUtils.copyFileToDirectory(source, dest, true);
+                }
             } else if (source.isDirectory()) {
                 FileUtils.copyDirectory(source, dest, true);
             }
@@ -285,6 +285,7 @@ public class Executor implements Runnable {
         mInputOutput.getOut().println("creating zip: " + targetFile.getAbsolutePath());
         var zipParameters = new ZipParameters();
         zipParameters.setIncludeRootFolder(false);
+        zipParameters.setRootFolderNameInZip(contentDir);
         var zipFile = new ZipFile(targetFile);
         zipFile.addFolder(targetDir, zipParameters);
 
@@ -316,9 +317,7 @@ public class Executor implements Runnable {
 //        environment.put("ARCH", "x86_64");
         var command = new ArrayList<String>();
         command.add(mOptions.get(OPT_APP_IMAGE_TOOL, "NO_COMMAND_SPECIFIED_CHECK_YOUR_SETTINGS"));
-        for (var option : StringUtils.split(mOptions.get(OPT_APP_IMAGE_OPTIONS, ""))) {
-            command.add(option);
-        }
+        command.addAll(Arrays.asList(StringUtils.split(mOptions.get(OPT_APP_IMAGE_OPTIONS, ""))));
 
         command.add(targetDir.getAbsolutePath());
         command.add(targetFile.getAbsolutePath());
@@ -344,20 +343,15 @@ public class Executor implements Runnable {
                 executeScript(null, targetDir, preScriptFile);
             }
 
-            var yaml = new File(targetDir, "snap/snapcraft.yaml");
-            var lines = new ArrayList<String>();
-            for (String line : FileUtils.readLines(yaml, "utf-8")) {
-                lines.add(line.replaceAll("version: '.*'", String.format("version: '%s'", mVersion)));
-            }
-
-            FileUtils.writeLines(yaml, "utf-8", lines);
+            var yamlFile = new File(targetDir, "snap/snapcraft.yaml");
+            var yamlContent = FileUtils.readFileToString(yamlFile, "utf-8");
+            yamlContent = RegExUtils.replaceFirst(yamlContent, "version: '.*'", "version: '%s'".formatted(mVersion));
+            FileUtils.writeStringToFile(yamlFile, yamlContent, "utf-8");
 
             var environment = new HashMap<String, String>();
             var command = new ArrayList<String>();
             command.add("snapcraft");
-            for (var option : StringUtils.split(mOptions.get(OPT_SNAP_OPTIONS, ""))) {
-                command.add(option);
-            }
+            command.addAll(Arrays.asList(StringUtils.split(mOptions.get(OPT_SNAP_OPTIONS, ""))));
 
             execute(command, environment, targetDir);
 
@@ -374,7 +368,9 @@ public class Executor implements Runnable {
     }
 
     private void execute(ArrayList<String> command, Map<String, String> environment, File workingDirectory) {
-        mInputOutput.getOut().println(getHeader() + String.join(" ", command));
+        var header = mDryRun ? "execute: (dry-run) " : "execute: ";
+
+        mInputOutput.getOut().println(header + String.join(" ", command));
 
         if (!mDryRun) {
             var processBuilder = new ProcessBuilder(command).inheritIO();
@@ -387,6 +383,7 @@ public class Executor implements Runnable {
             }
             try {
                 mCurrentProcess = processBuilder.start();
+                //TODO Redirect to output
 //                new ProcessLogThread(mCurrentProcess.getInputStream(), 0, mLog).start();
 //                new ProcessLogThread(mCurrentProcess.getErrorStream(), -1, mLog).start();
 //                Thread.sleep(1000);
@@ -402,10 +399,6 @@ public class Executor implements Runnable {
 
     private void executeScript(Map<String, String> environment, File workingDirectory, File script) {
         execute(environment, workingDirectory, script.getAbsolutePath());
-    }
-
-    private String getHeader() {
-        return mDryRun ? "execute: (dry-run) " : "execute: ";
     }
 
     private boolean initTargetDirectory() throws IOException {
@@ -457,6 +450,10 @@ public class Executor implements Runnable {
             for (var file : binDir.listFiles()) {
                 boolean exe = FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("exe");
                 if ((keepWindows && !exe) || (!keepWindows && exe)) {
+                    removeBin(file);
+                }
+
+                if (file.exists() && StringUtils.endsWithIgnoreCase(file.getName(), ".exe") && !StringUtils.endsWithIgnoreCase(file.getName(), "64.exe")) {
                     removeBin(file);
                 }
             }

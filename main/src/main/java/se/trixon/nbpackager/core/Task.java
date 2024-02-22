@@ -36,9 +36,9 @@ public class Task implements EditableListItem {
 
     private transient String mBasename;
     @SerializedName("checksum256")
-    private boolean mChecksumSha256;
+    private boolean mChecksumSha256 = true;
     @SerializedName("checksum512")
-    private boolean mChecksumSha512;
+    private boolean mChecksumSha512 = true;
     @SerializedName("description")
     private String mDescription;
     @SerializedName("destDir")

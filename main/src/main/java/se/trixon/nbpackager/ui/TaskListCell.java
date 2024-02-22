@@ -18,8 +18,7 @@ package se.trixon.nbpackager.ui;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+import se.trixon.almond.util.fx.FxHelper;
 import se.trixon.almond.util.fx.control.editable_list.EditableListCell;
 import se.trixon.nbpackager.core.ExecutorManager;
 import se.trixon.nbpackager.core.Task;
@@ -30,7 +29,6 @@ import se.trixon.nbpackager.core.Task;
  */
 public class TaskListCell extends EditableListCell<Task> {
 
-    private final Font mDefaultFont = Font.getDefault();
     private final Label mDescLabel = new Label();
     private final Label mNameLabel = new Label();
     private final VBox mRoot = new VBox();
@@ -68,10 +66,11 @@ public class TaskListCell extends EditableListCell<Task> {
     }
 
     private void createUI() {
-        String fontFamily = mDefaultFont.getFamily();
-        double fontSize = mDefaultFont.getSize();
-        mNameLabel.setFont(Font.font(fontFamily, FontWeight.BOLD, fontSize * 1.4));
-        mDescLabel.setFont(Font.font(fontFamily, FontWeight.NORMAL, fontSize * 1.1));
+        var fontSize = FxHelper.getScaledFontSize();
+        var fontStyle = "-fx-font-size: %.0fpx; -fx-font-weight: %s;";
+
+        mNameLabel.setStyle(fontStyle.formatted(fontSize * 1.4, "bold"));
+        mDescLabel.setStyle(fontStyle.formatted(fontSize * 1.1, "normal"));
     }
 
 }
