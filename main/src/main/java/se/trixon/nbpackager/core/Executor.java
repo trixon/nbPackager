@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -32,6 +33,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.netbeans.api.extexecution.ExecutionDescriptor;
+import org.netbeans.api.extexecution.ExecutionService;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -367,34 +370,55 @@ public class Executor implements Runnable {
         execute(new ArrayList<>(Arrays.asList(commands)), environment, workingDirectory);
     }
 
-    private void execute(ArrayList<String> command, Map<String, String> environment, File workingDirectory) {
+    private int execute(ArrayList<String> command, Map<String, String> environment, File workingDirectory) {
         var header = mDryRun ? "execute: (dry-run) " : "execute: ";
 
         mInputOutput.getOut().println(header + String.join(" ", command));
 
-        if (!mDryRun) {
-            var processBuilder = new ProcessBuilder(command).inheritIO();
-            processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);
-            if (environment != null) {
-                processBuilder.environment().putAll(environment);
-            }
-            if (workingDirectory != null) {
-                processBuilder.directory(workingDirectory);
-            }
-            try {
-                mCurrentProcess = processBuilder.start();
-                //TODO Redirect to output
-//                new ProcessLogThread(mCurrentProcess.getInputStream(), 0, mLog).start();
-//                new ProcessLogThread(mCurrentProcess.getErrorStream(), -1, mLog).start();
-//                Thread.sleep(1000);
-                mCurrentProcess.waitFor();
-            } catch (IOException ex) {
-//                mLog.timedErr(ex.getMessage());
-            } catch (InterruptedException ex) {
-                mCurrentProcess.destroy();
-                mInterrupted = true;
-            }
+        if (mDryRun) {
+            return 0;
         }
+
+        var processBuilder = org.netbeans.api.extexecution.base.ProcessBuilder.getLocal();
+        processBuilder.setExecutable(command.getFirst());
+        if (command.size() > 1) {
+            processBuilder.setArguments(command.subList(1, command.size()));
+        }
+        if (environment != null) {
+            processBuilder.getEnvironment().values().putAll(environment);
+        }
+        if (workingDirectory != null) {
+            processBuilder.setWorkingDirectory(workingDirectory.getAbsolutePath());
+        }
+
+        var descriptor = new ExecutionDescriptor()
+                .frontWindow(true)
+                .inputOutput(mInputOutput)
+                .noReset(true)
+                .errLineBased(true)
+                .outLineBased(true)
+                .showProgress(false);
+
+        var service = ExecutionService.newService(
+                processBuilder,
+                descriptor,
+                mTask.getName());
+
+        var task = service.run();
+
+        try {
+            return task.get();
+        } catch (InterruptedException ex) {
+            task.cancel(true);
+            mCurrentProcess.destroy();
+            mInterrupted = true;
+        } catch (ExecutionException ex) {
+            task.cancel(true);
+            mInputOutput.getErr().println(ex);
+            Exceptions.printStackTrace(ex);
+        }
+
+        return -1;
     }
 
     private void executeScript(Map<String, String> environment, File workingDirectory, File script) {

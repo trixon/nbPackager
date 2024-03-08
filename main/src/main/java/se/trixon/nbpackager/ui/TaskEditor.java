@@ -151,6 +151,11 @@ public class TaskEditor extends GridPane {
         mAnyCheckedTab.getTabCheckBox().setSelected(task.isTargetAny());
 
         mNameTextField.requestFocus();
+
+        Platform.runLater(() -> {
+            mNameTextField.requestFocus();
+            mValidationSupport.revalidate();
+        });
     }
 
     private void createUI() {
