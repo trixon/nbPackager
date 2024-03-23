@@ -261,17 +261,36 @@ public class Executor implements Runnable {
         }
 
         boolean keepWindows = false;
+        var ideLibs = new File(targetDir, "ide/modules/lib");
+        var platformLibs = new File(targetDir, "platform/modules/lib");
         if (target.equalsIgnoreCase("linux") && mTask.isTargetLinux()) {
             copyJre(mTask.getJreLinux(), targetDir);
+            removeFileByExt(ideLibs, "dll");
+            removeFileByExt(platformLibs, "dll", "dylib");
+            removeFileByExt(new File(platformLibs, "amd64"), "dll", "dylib");
         } else if (target.equalsIgnoreCase("mac") && mTask.isTargetMac()) {
             copyJre(mTask.getJreMac(), targetDir);
+            removeFileByExt(ideLibs, "dll");
+            removeFileByExt(platformLibs, "dll", "so");
+            removeFileByExt(new File(platformLibs, "amd64"), "dll", "so");
         } else if (target.equalsIgnoreCase("windows") && mTask.isTargetWindows()) {
             copyJre(mTask.getJreWindows(), targetDir);
+            removeFileByExt(platformLibs, "dylib", "so");
+            removeFileByExt(new File(platformLibs, "amd64"), "dylib", "so");
             keepWindows = true;
         }
 
+        removeDirs(targetDir,
+                "platform/modules/lib/aarch64",
+                "platform/modules/lib/i386",
+                "platform/modules/lib/riscv64",
+                "platform/modules/lib/x86",
+                "platform/modules/lib/x86_64"
+        );
+
         if (!target.equalsIgnoreCase("any")) {
             removeBin(new File(targetDir, "bin"), keepWindows);
+            removeBin(new File(targetDir, "platform/lib"), keepWindows);
         }
 
         var targetFile = new File(mDestDir, String.format("%s-%s.zip", mTask.getBasename(), target));
@@ -461,6 +480,9 @@ public class Executor implements Runnable {
     }
 
     private void removeBin(File file) throws IOException {
+        if (StringUtils.endsWithIgnoreCase(file.getName(), "jar")) {
+            return;
+        }
         mInputOutput.getOut().println("remove: " + file.getAbsolutePath());
         if (!mDryRun) {
             FileUtils.forceDelete(file);
@@ -472,14 +494,35 @@ public class Executor implements Runnable {
             mInputOutput.getOut().println("remove non platform executable(s)");
         } else {
             for (var file : binDir.listFiles()) {
-                boolean exe = FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("exe");
-                if ((keepWindows && !exe) || (!keepWindows && exe)) {
+                var extension = FilenameUtils.getExtension(file.getName());
+                boolean windowSpecificFile = StringUtils.equalsAnyIgnoreCase(extension, "exe", "dll");
+
+                if ((keepWindows && !windowSpecificFile) || (!keepWindows && windowSpecificFile)) {
                     removeBin(file);
                 }
 
-                if (file.exists() && StringUtils.endsWithIgnoreCase(file.getName(), ".exe") && !StringUtils.endsWithIgnoreCase(file.getName(), "64.exe")) {
+                if (file.exists() && windowSpecificFile && !StringUtils.endsWithAny(file.getName().toLowerCase(Locale.ROOT), "64.dll", "64.exe")) {
                     removeBin(file);
                 }
+            }
+        }
+    }
+
+    private void removeDirs(File startDir, String... dirsToRemove) {
+        for (var subDir : dirsToRemove) {
+            var dir = new File(startDir, subDir);
+            if (dir.isDirectory()) {
+                mInputOutput.getOut().println("removing dir : " + dir);
+                FileUtils.deleteQuietly(dir);
+            }
+        }
+    }
+
+    private void removeFileByExt(File startDir, String... exts) {
+        for (var file : startDir.listFiles()) {
+            if (file.isFile() && StringUtils.endsWithAny(file.getName().toLowerCase(Locale.ROOT), exts)) {
+                mInputOutput.getOut().println("removing file : " + file);
+                FileUtils.deleteQuietly(file);
             }
         }
     }
