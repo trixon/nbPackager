@@ -138,6 +138,7 @@ public class Executor implements Runnable {
 
                 if (!mInterrupted && mTask.isTargetLinux()) {
                     createPackage("linux");
+                    createPackage("linux-without-runtime");
 
                     if (!mInterrupted && mTask.isTargetLinuxAppImage()) {
                         createPackageAppImage();
@@ -263,8 +264,10 @@ public class Executor implements Runnable {
         boolean keepWindows = false;
         var ideLibs = new File(targetDir, "ide/modules/lib");
         var platformLibs = new File(targetDir, "platform/modules/lib");
-        if (target.equalsIgnoreCase("linux") && mTask.isTargetLinux()) {
-            copyJre(mTask.getJreLinux(), targetDir);
+        if (StringUtils.startsWithIgnoreCase(target, "linux") && mTask.isTargetLinux()) {
+            if (StringUtils.endsWithIgnoreCase(target, "linux")) {
+                copyJre(mTask.getJreLinux(), targetDir);
+            }
             removeFileByExt(ideLibs, "dll");
             removeFileByExt(platformLibs, "dll", "dylib");
             removeFileByExt(new File(platformLibs, "amd64"), "dll", "dylib");
@@ -295,7 +298,7 @@ public class Executor implements Runnable {
 
         var targetFile = new File(mDestDir, String.format("%s-%s.zip", mTask.getBasename(), target));
         var contentDir = mContentDir;
-        if (target.equals("linux")) {
+        if (StringUtils.startsWithIgnoreCase(target, "linux")) {
             mLinuxTargetFile = targetFile;
         } else if (target.equals("mac")) {
             var oldTargetDir = targetDir;
@@ -519,6 +522,10 @@ public class Executor implements Runnable {
     }
 
     private void removeFileByExt(File startDir, String... exts) {
+        if (!startDir.isDirectory()) {
+            return;
+        }
+
         for (var file : startDir.listFiles()) {
             if (file.isFile() && StringUtils.endsWithAny(file.getName().toLowerCase(Locale.ROOT), exts)) {
                 mInputOutput.getOut().println("removing file : " + file);
