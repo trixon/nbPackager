@@ -240,15 +240,15 @@ public class Task implements EditableListItem {
             addValidationError("invalid Snap template directory: " + mTemplateDirSnap);
         }
 
-        if (mJreLinux != null && !mJreLinux.isDirectory()) {
+        if (mTargetLinux && mJreLinux != null && !mJreLinux.isDirectory()) {
             addValidationError("invalid Linux JRE: " + mJreLinux);
         }
 
-        if (mJreMac != null && !mJreMac.isDirectory()) {
+        if (mTargetMac && mJreMac != null && !mJreMac.isDirectory()) {
             addValidationError("invalid Mac JRE: " + mJreMac);
         }
 
-        if (mJreWindows != null && !mJreWindows.isDirectory()) {
+        if (mTargetWindows && mJreWindows != null && !mJreWindows.isDirectory()) {
             addValidationError("invalid Windows JRE: " + mJreWindows);
         }
 

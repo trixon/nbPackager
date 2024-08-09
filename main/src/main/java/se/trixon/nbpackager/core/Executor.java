@@ -137,8 +137,8 @@ public class Executor implements Runnable {
                 }
 
                 if (!mInterrupted && mTask.isTargetLinux()) {
-                    createPackage("linux");
                     createPackage("linux-without-runtime");
+                    createPackage("linux");
 
                     if (!mInterrupted && mTask.isTargetLinuxAppImage()) {
                         createPackageAppImage();
@@ -185,7 +185,7 @@ public class Executor implements Runnable {
         mExecutorThread.start();
     }
 
-    private void copyJre(File jreDir, File targetDir) throws IOException {
+    private void copyJre(File jreDir, File targetDir, boolean updateJdkHome) throws IOException {
         if (jreDir == null) {
             mInputOutput.getOut().println("No jre specified.");
             return;
@@ -197,9 +197,11 @@ public class Executor implements Runnable {
         mInputOutput.getOut().println("set jdkhome in " + etcFile.getAbsolutePath());
         mInputOutput.getOut().println("copy jre to: " + destDir.getAbsolutePath());
         if (!mDryRun) {
-            var etcContent = FileUtils.readFileToString(etcFile, "utf-8");
-            var key = StringUtils.contains(etcContent, "netbeans_jdkhome") ? "netbeans_jdkhome" : "jdkhome";
-            FileUtils.write(etcFile, String.format("\n\n# Added by Packager\n%s=\"%s\"\n", key, jreName), "utf-8", true);
+            if (updateJdkHome) {
+                var etcContent = FileUtils.readFileToString(etcFile, "utf-8");
+                var key = StringUtils.contains(etcContent, "netbeans_jdkhome") ? "netbeans_jdkhome" : "jdkhome";
+                FileUtils.write(etcFile, String.format("\n\n# Added by Packager\n%s=\"%s\"\n", key, jreName), "utf-8", true);
+            }
             cp(jreDir, destDir, false);
         }
     }
@@ -266,18 +268,18 @@ public class Executor implements Runnable {
         var platformLibs = new File(targetDir, "platform/modules/lib");
         if (StringUtils.startsWithIgnoreCase(target, "linux") && mTask.isTargetLinux()) {
             if (StringUtils.endsWithIgnoreCase(target, "linux")) {
-                copyJre(mTask.getJreLinux(), targetDir);
+                copyJre(mTask.getJreLinux(), targetDir, true);
             }
             removeFileByExt(ideLibs, "dll");
             removeFileByExt(platformLibs, "dll", "dylib");
             removeFileByExt(new File(platformLibs, "amd64"), "dll", "dylib");
         } else if (target.equalsIgnoreCase("mac") && mTask.isTargetMac()) {
-            copyJre(mTask.getJreMac(), targetDir);
+            copyJre(mTask.getJreMac(), targetDir, true);
             removeFileByExt(ideLibs, "dll");
             removeFileByExt(platformLibs, "dll", "so");
             removeFileByExt(new File(platformLibs, "amd64"), "dll", "so");
         } else if (target.equalsIgnoreCase("windows") && mTask.isTargetWindows()) {
-            copyJre(mTask.getJreWindows(), targetDir);
+            copyJre(mTask.getJreWindows(), targetDir, true);
             removeFileByExt(platformLibs, "dylib", "so");
             removeFileByExt(new File(platformLibs, "amd64"), "dylib", "so");
             keepWindows = true;
@@ -330,13 +332,15 @@ public class Executor implements Runnable {
         }
 
         var usrDir = new File(targetDir, "usr");
-        mInputOutput.getOut().println("copy zip contents to: " + usrDir.getAbsolutePath());
+        var libDir = new File(usrDir, "lib");
+        var platformAppDir = new File(libDir, mContentDir);
+        mInputOutput.getOut().println("copy zip contents to: " + platformAppDir.getAbsolutePath());
         if (!mDryRun) {
-            cp(new File(mTempDir, mContentDir), usrDir, true);
+            cp(new File(mTempDir, mContentDir), platformAppDir, true);
         }
 
-        removeBin(new File(usrDir, "bin"), false);
-        copyJre(mTask.getJreLinux(), usrDir);
+        removeBin(new File(platformAppDir, "bin"), false);
+        copyJre(mTask.getJreLinux(), libDir, false);
 
         var environment = new HashMap<String, String>();
 //        environment.put("ARCH", "x86_64");
