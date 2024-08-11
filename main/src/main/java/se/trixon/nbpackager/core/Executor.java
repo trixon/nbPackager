@@ -15,6 +15,7 @@
  */
 package se.trixon.nbpackager.core;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -42,9 +43,12 @@ import org.openide.awt.StatusDisplayer;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.windows.FoldHandle;
+import org.openide.windows.IOColorPrint;
 import org.openide.windows.IOFolding;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
+import org.openide.windows.OutputEvent;
+import se.trixon.almond.nbp.output.OutputAdapter;
 import se.trixon.almond.nbp.output.OutputHelper;
 import se.trixon.almond.nbp.output.OutputLineMode;
 import se.trixon.almond.util.Dict;
@@ -353,6 +357,18 @@ public class Executor implements Runnable {
         execute(command, environment, null);
 
         createChecksums(targetFile);
+        mInputOutput.getOut().print("\n%s ".formatted(Dict.OPEN.toString()));
+        try {
+            IOColorPrint.print(mInputOutput, targetFile.getAbsolutePath(), new OutputAdapter() {
+                @Override
+                public void outputLineAction(OutputEvent ev) {
+                    new Thread(() -> executeScript(null, targetDir, targetFile)).start();
+                }
+            }, false, Color.MAGENTA);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        mInputOutput.getOut().println(".");
     }
 
     private void createPackageSnap() throws IOException {
