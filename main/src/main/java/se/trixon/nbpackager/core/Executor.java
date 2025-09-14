@@ -34,6 +34,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.netbeans.api.extexecution.ExecutionDescriptor;
 import org.netbeans.api.extexecution.ExecutionService;
 import org.netbeans.api.progress.ProgressHandle;
@@ -203,7 +204,7 @@ public class Executor implements Runnable {
         if (!mDryRun) {
             if (updateJdkHome) {
                 var etcContent = FileUtils.readFileToString(etcFile, "utf-8");
-                var key = StringUtils.contains(etcContent, "netbeans_jdkhome") ? "netbeans_jdkhome" : "jdkhome";
+                var key = Strings.CS.contains(etcContent, "netbeans_jdkhome") ? "netbeans_jdkhome" : "jdkhome";
                 FileUtils.write(etcFile, String.format("\n\n# Added by Packager\n%s=\"%s\"\n", key, jreName), "utf-8", true);
             }
             cp(jreDir, destDir, false);
@@ -227,7 +228,7 @@ public class Executor implements Runnable {
     }
 
     private void createChecksum(File file, String algorithm) throws IOException {
-        var digestFile = new File(file.getAbsolutePath() + String.format(".%s", StringUtils.remove(algorithm, "-").toLowerCase(Locale.getDefault())));
+        var digestFile = new File(file.getAbsolutePath() + String.format(".%s", Strings.CS.remove(algorithm, "-").toLowerCase(Locale.getDefault())));
         mInputOutput.getOut().println("create checksum: " + digestFile.getAbsolutePath());
         if (!mDryRun) {
             var digest = new DigestUtils(algorithm).digestAsHex(file);
@@ -270,8 +271,8 @@ public class Executor implements Runnable {
         boolean keepWindows = false;
         var ideLibs = new File(targetDir, "ide/modules/lib");
         var platformLibs = new File(targetDir, "platform/modules/lib");
-        if (StringUtils.startsWithIgnoreCase(target, "linux") && mTask.isTargetLinux()) {
-            if (StringUtils.endsWithIgnoreCase(target, "linux")) {
+        if (Strings.CI.startsWith(target, "linux") && mTask.isTargetLinux()) {
+            if (Strings.CI.endsWith(target, "linux")) {
                 copyJre(mTask.getJreLinux(), targetDir, true);
             }
             removeFileByExt(ideLibs, "dll");
@@ -304,7 +305,7 @@ public class Executor implements Runnable {
 
         var targetFile = new File(mDestDir, String.format("%s-%s.zip", mTask.getBasename(), target));
         var contentDir = mContentDir;
-        if (StringUtils.startsWithIgnoreCase(target, "linux")) {
+        if (Strings.CI.startsWith(target, "linux")) {
             mLinuxTargetFile = targetFile;
         } else if (target.equals("mac")) {
             var oldTargetDir = targetDir;
@@ -327,9 +328,9 @@ public class Executor implements Runnable {
         mInputOutput.getOut().println("\ncreate package: AppImage");
         mInputOutput.getOut().println("copy template to: " + mDestDir.getAbsolutePath());
         var templateName = mTask.getTemplateDirAppImage().getName();
-        templateName = StringUtils.replace(templateName, "__", String.format("-%s-", mVersion));
+        templateName = Strings.CS.replace(templateName, "__", String.format("-%s-", mVersion));
         var targetDir = new File(mDestDir, templateName);
-        var targetFile = new File(mDestDir, StringUtils.replace(templateName, "AppDir", "AppImage"));
+        var targetFile = new File(mDestDir, Strings.CS.replace(templateName, "AppDir", "AppImage"));
 
         if (!mDryRun) {
             cp(mTask.getTemplateDirAppImage(), targetDir, false);
@@ -357,7 +358,7 @@ public class Executor implements Runnable {
         execute(command, environment, null);
 
         createChecksums(targetFile);
-        mInputOutput.getOut().print("\n%s ".formatted(Dict.OPEN.toString()));
+        mInputOutput.getOut().println("\n%s ".formatted(Dict.OPEN.toString()));
         try {
             IOColorPrint.print(mInputOutput, targetFile.getAbsolutePath(), new OutputAdapter() {
                 @Override
@@ -368,7 +369,6 @@ public class Executor implements Runnable {
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
-        mInputOutput.getOut().println(".");
     }
 
     private void createPackageSnap() throws IOException {
@@ -503,7 +503,7 @@ public class Executor implements Runnable {
     }
 
     private void removeBin(File file) throws IOException {
-        if (StringUtils.endsWithIgnoreCase(file.getName(), "jar")) {
+        if (Strings.CI.endsWith(file.getName(), "jar")) {
             return;
         }
         mInputOutput.getOut().println("remove: " + file.getAbsolutePath());
@@ -518,13 +518,13 @@ public class Executor implements Runnable {
         } else {
             for (var file : binDir.listFiles()) {
                 var extension = FilenameUtils.getExtension(file.getName());
-                boolean windowSpecificFile = StringUtils.equalsAnyIgnoreCase(extension, "exe", "dll");
+                boolean windowSpecificFile = Strings.CI.equalsAny(extension, "exe", "dll");
 
                 if ((keepWindows && !windowSpecificFile) || (!keepWindows && windowSpecificFile)) {
                     removeBin(file);
                 }
 
-                if (file.exists() && windowSpecificFile && !StringUtils.endsWithAny(file.getName().toLowerCase(Locale.ROOT), "64.dll", "64.exe")) {
+                if (file.exists() && windowSpecificFile && !Strings.CS.endsWithAny(file.getName().toLowerCase(Locale.ROOT), "64.dll", "64.exe")) {
                     removeBin(file);
                 }
             }
@@ -547,7 +547,7 @@ public class Executor implements Runnable {
         }
 
         for (var file : startDir.listFiles()) {
-            if (file.isFile() && StringUtils.endsWithAny(file.getName().toLowerCase(Locale.ROOT), exts)) {
+            if (file.isFile() && Strings.CS.endsWithAny(file.getName().toLowerCase(Locale.ROOT), exts)) {
                 mInputOutput.getOut().println("removing file : " + file);
                 FileUtils.deleteQuietly(file);
             }
