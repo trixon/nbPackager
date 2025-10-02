@@ -396,6 +396,7 @@ public class Executor implements Runnable {
             var environment = new HashMap<String, String>();
             var command = new ArrayList<String>();
             command.add("snapcraft");
+            command.add("pack");
             command.addAll(Arrays.asList(StringUtils.split(mOptions.get(OPT_SNAP_OPTIONS, ""))));
 
             execute(command, environment, targetDir);
