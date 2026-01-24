@@ -10,7 +10,7 @@
 
     <groupId>se.trixon.nbpackager</groupId>
     <artifactId>parent</artifactId>
-    <version>25.10</version>
+    <version>25.10x</version>
     <packaging>pom</packaging>
 
     <name>nbPackager-parent</name>
