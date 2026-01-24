@@ -19,12 +19,16 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
@@ -62,10 +66,12 @@ import static se.trixon.nbpackager.Options.*;
  */
 public class Executor implements Runnable {
 
-    private String mContentDir = "NOT_AVAILABLE_IN_DRY_RUN";
+    private String mContentDir;
     private Process mCurrentProcess;
     private File mDestDir;
     private final boolean mDryRun;
+    private String mEmbeddedContentDir;
+    private File mEmbeddedTempDir;
     private Thread mExecutorThread;
     private final InputOutput mInputOutput;
     private boolean mInterrupted;
@@ -134,7 +140,19 @@ public class Executor implements Runnable {
                 }
 
                 if (!mInterrupted) {
-                    unzip();
+                    mTempDir = Files.createTempDirectory("packager").toFile();
+                    mContentDir = unzip(mTempDir, mTask.getSourceFile());
+                }
+
+                if (!mInterrupted && mTask.isExecuteEmbedding()) {
+                    mEmbeddedTempDir = Files.createTempDirectory("packager_embedded").toFile();
+                    mEmbeddedContentDir = unzip(mEmbeddedTempDir, mTask.getEmbeddedFile());
+                }
+
+                if (!mInterrupted && mTask.isExecuteEmbedding() && mTask.getEmbeddedFile() != null) {
+                    if (!mDryRun) {
+                        mergeEmbeddedToTemp();
+                    }
                 }
 
                 if (!mInterrupted && mTask.isTargetAny()) {
@@ -170,6 +188,10 @@ public class Executor implements Runnable {
                 if (mTempDir != null) {
                     FileUtils.deleteDirectory(mTempDir);
                 }
+
+                if (mEmbeddedTempDir != null) {
+                    FileUtils.deleteDirectory(mEmbeddedTempDir);
+                }
             } catch (IOException e) {
                 System.err.println(e);
             }
@@ -195,18 +217,29 @@ public class Executor implements Runnable {
             mInputOutput.getOut().println("No jre specified.");
             return;
         }
-        var etc = String.format("etc/%s.conf", mContentDir);
+
         var jreName = jreDir.getName();
+        var etcDir = new File(targetDir, "etc");
+        try (var stream = Files.newDirectoryStream(etcDir.toPath(), "*.{conf}"
+        )) {
+            for (var path : stream) {
+                var etcFile = path.toFile();
+                mInputOutput.getOut().println("set jdkhome in " + etcFile.getAbsolutePath());
+                if (!mDryRun) {
+                    if (updateJdkHome) {
+                        var etcContent = FileUtils.readFileToString(etcFile, "utf-8");
+                        var key = Strings.CS.contains(etcContent, "netbeans_jdkhome") ? "netbeans_jdkhome" : "jdkhome";
+                        FileUtils.write(etcFile, String.format("\n\n# Added by Packager\n%s=\"%s\"\n", key, jreName), "utf-8", true);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            Exceptions.printStackTrace(e);
+        }
+
         var destDir = new File(targetDir, jreName);
-        var etcFile = new File(targetDir, etc);
-        mInputOutput.getOut().println("set jdkhome in " + etcFile.getAbsolutePath());
         mInputOutput.getOut().println("copy jre to: " + destDir.getAbsolutePath());
         if (!mDryRun) {
-            if (updateJdkHome) {
-                var etcContent = FileUtils.readFileToString(etcFile, "utf-8");
-                var key = Strings.CS.contains(etcContent, "netbeans_jdkhome") ? "netbeans_jdkhome" : "jdkhome";
-                FileUtils.write(etcFile, String.format("\n\n# Added by Packager\n%s=\"%s\"\n", key, jreName), "utf-8", true);
-            }
             cp(jreDir, destDir, false);
         }
     }
@@ -266,13 +299,6 @@ public class Executor implements Runnable {
                 if (!"any".equals(target)) {
                     cp(new File(mTask.getResourceDir(), target), targetDir, true);
                 }
-            }
-        }
-
-        if (mTask.isExecuteEmbedding() && mTask.getEmbeddedDir() != null && mTask.getEmbeddedDir().isDirectory()) {
-            mInputOutput.getOut().println("embed application to: " + targetDir.getAbsolutePath());
-            if (!mDryRun) {
-                embed(mTask.getEmbeddedDir(), targetDir);
             }
         }
 
@@ -417,16 +443,6 @@ public class Executor implements Runnable {
         }
     }
 
-    private void embed(File embeddedDir, File targetDir) {
-        //TODO
-        /*
-        edit clusters, prepend embedded or app name
-        cp bin/*
-        cp etc/* (read, manipulate, write) cluster file
-        cp all dirs except bin, etc, platform, prepend prefix
-         */
-    }
-
     private void execute(Map<String, String> environment, File workingDirectory, String... commands) {
         execute(new ArrayList<>(Arrays.asList(commands)), environment, workingDirectory);
     }
@@ -521,6 +537,47 @@ public class Executor implements Runnable {
         ExecutorManager.getInstance().getExecutors().remove(mTask.getId());
     }
 
+    private void mergeEmbeddedToTemp() {
+        mInputOutput.getOut().println("merge embedded application");
+        var baseSourceDir = new File(mEmbeddedTempDir, mEmbeddedContentDir);
+        var baseDestDir = new File(mTempDir, mContentDir);
+        try (var stream = Files.list(Path.of(mEmbeddedTempDir.getAbsolutePath(), mEmbeddedContentDir))) {
+            stream.map(p -> p.toFile())
+                    .filter(f -> f.isDirectory())
+                    .filter(f -> !Set.of("bin", "etc", "platform").contains(f.getName()))
+                    .forEachOrdered(f -> {
+                        var fileName = f.getName();
+                        var destName = mEmbeddedContentDir.equalsIgnoreCase(fileName) ? fileName : "%s_%s".formatted(mEmbeddedContentDir, fileName);
+                        cp(f, new File(baseDestDir, destName), false);
+                    });
+        } catch (IOException e) {
+            Exceptions.printStackTrace(e);
+        }
+
+        List.of("bin", "etc").forEach(dir -> {
+            var src = new File(baseSourceDir, dir);
+            var dest = new File(baseDestDir, dir);
+            cp(src, dest, true);
+        });
+
+        var clustersFile = new File(baseDestDir, "etc/%s.clusters".formatted(mEmbeddedContentDir));
+        try {
+            var clusters = FileUtils.readLines(clustersFile, StandardCharsets.UTF_8).stream()
+                    .map(s -> {
+                        if (Set.of("etc", "bin", "platform", mEmbeddedContentDir).contains(s)) {
+                            return s;
+                        } else {
+                            return "%s_%s".formatted(mEmbeddedContentDir, s);
+                        }
+                    })
+                    .toList();
+
+            FileUtils.writeLines(clustersFile, clusters);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+
     private void removeBin(File file) throws IOException {
         if (Strings.CI.endsWith(file.getName(), "jar")) {
             return;
@@ -573,16 +630,17 @@ public class Executor implements Runnable {
         }
     }
 
-    private void unzip() throws IOException {
-        mTempDir = Files.createTempDirectory("packager").toFile();
-        mTempDir.deleteOnExit();
-        mInputOutput.getOut().println("create temp dir: " + mTempDir.getAbsolutePath());
-        mInputOutput.getOut().println("unzip: " + mTask.getSourceFile());
+    private String unzip(File tempDir, File sourceFile) throws IOException {
+        tempDir.deleteOnExit();
+        mInputOutput.getOut().println("create temp dir: " + tempDir.getAbsolutePath());
+        mInputOutput.getOut().println("unzip: " + sourceFile);
 
         if (!mDryRun) {
-            new ZipFile(mTask.getSourceFile()).extractAll(mTempDir.getAbsolutePath());
-            mContentDir = mTempDir.list()[0];
+            new ZipFile(sourceFile).extractAll(tempDir.getAbsolutePath());
+            return tempDir.list()[0];
         }
+
+        return "NOT_AVAILABLE_IN_DRY_RUN";
     }
 
 }

@@ -37,8 +37,6 @@ public class DoOnStart implements Runnable {
         NbHelper.setLafDefault("Light");
         NbHelper.setLafAccentColor("#ff453a");
         NbHelper.initNightModeIfNeeded();
-
-        NbOptionalDialog.setPreferences(NbPreferences.forModule(NbOptionalDialog.class).node("optionalDialogState"));
     }
 
     @Override
@@ -48,6 +46,7 @@ public class DoOnStart implements Runnable {
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
+        NbOptionalDialog.setPreferences(NbPreferences.forModule(NbOptionalDialog.class).node("optionalDialogState"));
     }
 
 }

@@ -35,6 +35,8 @@ import static se.trixon.nbpackager.Options.OPT_APP_IMAGE_TOOL;
 public class Task implements EditableListItem {
 
     private transient String mBasename;
+    private File mEmbeddedFile;
+    private transient String mEmbeddedName;
     @SerializedName("checksum256")
     private boolean mChecksumSha256 = true;
     @SerializedName("checksum512")
@@ -110,6 +112,14 @@ public class Task implements EditableListItem {
 
     public File getEmbeddedDir() {
         return mEmbeddedDir;
+    }
+
+    public File getEmbeddedFile() {
+        return mEmbeddedFile;
+    }
+
+    public String getEmbeddedName() {
+        return mEmbeddedName;
     }
 
     public String getId() {
@@ -226,6 +236,9 @@ public class Task implements EditableListItem {
 
         if (!validSourceFile()) {
             addValidationError("no zip found in " + mSourceDir);
+        }
+        if (!validEmbeddedFile()) {
+            addValidationError("no embedded zip found in " + mEmbeddedDir);
         }
 
         if (mDestDir == null || !mDestDir.isDirectory()) {
@@ -478,7 +491,7 @@ public class Task implements EditableListItem {
         FilenameFilter filter = (dir, name) -> name.endsWith(".zip");
 
         try {
-            String firstFilename = mSourceDir.list(filter)[0];
+            var firstFilename = mSourceDir.list(filter)[0];
             mBasename = FilenameUtils.getBaseName(firstFilename);
             mSourceFile = new File(mSourceDir, firstFilename);
         } catch (Exception e) {
@@ -486,5 +499,19 @@ public class Task implements EditableListItem {
         }
 
         return mSourceFile != null && mSourceFile.isFile();
+    }
+
+    private boolean validEmbeddedFile() {
+        FilenameFilter filter = (dir, name) -> name.endsWith(".zip");
+
+        try {
+            var firstFilename = mEmbeddedDir.list(filter)[0];
+            mEmbeddedName = FilenameUtils.getBaseName(firstFilename);
+            mEmbeddedFile = new File(mEmbeddedDir, firstFilename);
+        } catch (Exception e) {
+            mEmbeddedFile = null;
+        }
+
+        return mEmbeddedFile != null && mEmbeddedFile.isFile();
     }
 }
