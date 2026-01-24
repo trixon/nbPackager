@@ -47,6 +47,7 @@ public class TaskEditor extends GridPane {
     private TextField mDescTextField;
     private final FileChooserPaneSwingFx mDestChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), Dict.DESTINATION.toString(), Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY);
     private DialogDescriptor mDialogDescriptor;
+    private final FileChooserPaneSwingFx mEmbeddedChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY, "Embedded platform application");
     private final FileChooserPaneSwingFx mJreLinuxChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), "JRE", Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY);
     private final FileChooserPaneSwingFx mJreMacChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), "JRE", Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY);
     private final FileChooserPaneSwingFx mJreWindowsChooserPane = new FileChooserPaneSwingFx(Dict.SELECT.toString(), "JRE", Almond.getFrame(), JFileChooser.DIRECTORIES_ONLY);
@@ -68,6 +69,7 @@ public class TaskEditor extends GridPane {
     private CheckedTab mWindowsCheckedTab;
 
     public TaskEditor() {
+        super(FxHelper.getUIScaled(16), FxHelper.getUIScaled(8));
         createUI();
 
         Platform.runLater(() -> {
@@ -90,6 +92,8 @@ public class TaskEditor extends GridPane {
         mTask.setTemplateDirSnap(mTemplateDirSnapChooserPane.getPath());
         mTask.setExecuteResources(mResourceChooserPane.getCheckBox().isSelected());
         mTask.setResourceDir(mResourceChooserPane.getPath());
+        mTask.setExecuteEmbedding(mEmbeddedChooserPane.getCheckBox().isSelected());
+        mTask.setEmbeddedDir(mEmbeddedChooserPane.getPath());
 
         mTask.setJreLinux(mJreLinuxChooserPane.getPath());
         mTask.setJreMac(mJreMacChooserPane.getPath());
@@ -133,6 +137,8 @@ public class TaskEditor extends GridPane {
         mTemplateDirSnapChooserPane.setPath(task.getTemplateDirSnap());
         mResourceChooserPane.getCheckBox().setSelected(task.isExecuteResources());
         mResourceChooserPane.setPath(task.getResourceDir());
+        mEmbeddedChooserPane.getCheckBox().setSelected(task.isExecuteEmbedding());
+        mEmbeddedChooserPane.setPath(task.getEmbeddedDir());
 
         mSha256SumCheckBox.setSelected(task.isChecksumSha256());
         mSha512SumCheckBox.setSelected(task.isChecksumSha512());
@@ -159,8 +165,6 @@ public class TaskEditor extends GridPane {
     }
 
     private void createUI() {
-        setHgap(8);
-
         var nameLabel = new Label(Dict.NAME.toString());
         var descLabel = new Label(Dict.DESCRIPTION.toString());
 
@@ -195,18 +199,15 @@ public class TaskEditor extends GridPane {
                 mSha512SumCheckBox
         );
         checkBoxBox.setAlignment(Pos.BOTTOM_RIGHT);
-        checkBoxBox.setPadding(FxHelper.getUIScaledInsets(0, 0, 8, 0));
 
         int row = 0;
         addRow(row++, nameLabel, descLabel);
         addRow(row++, mNameTextField, mDescTextField);
-        add(mSourceChooserPane, 0, ++row, 1, 1);
-        add(mDestChooserPane, 1, row, 1, 1);
-        add(mScriptPreChooserPane, 0, ++row, 1, 1);
-        add(mScriptPostChooserPane, 1, row, 1, 1);
-        add(mResourceChooserPane, 0, ++row, 1, 1);
-        add(checkBoxBox, 1, row, 1, 1);
-        add(mTabPane, 0, ++row, GridPane.REMAINING, 1);
+        addRow(row++, mSourceChooserPane, mDestChooserPane);
+        addRow(row++, mScriptPreChooserPane, mScriptPostChooserPane);
+        addRow(row++, mResourceChooserPane, mEmbeddedChooserPane);
+        add(checkBoxBox, 1, row++, 1, 1);
+        add(mTabPane, 0, row++, GridPane.REMAINING, 1);
 
         FxHelper.autoSizeRegionHorizontal(
                 mNameTextField,
@@ -218,17 +219,7 @@ public class TaskEditor extends GridPane {
         mNameTextField.setPrefWidth(1000);
         mDescTextField.setPrefWidth(1000);
 
-        FxHelper.setPadding(FxHelper.getUIScaledInsets(8, 0, 0, 0),
-                mSourceChooserPane,
-                mDestChooserPane,
-                mScriptPreChooserPane,
-                mScriptPostChooserPane,
-                mTemplateDirAppImageChooserPane,
-                mTemplateDirSnapChooserPane,
-                mResourceChooserPane
-        );
-
-        FxHelper.setPadding(FxHelper.getUIScaledInsets(18, 0, 0, 0),
+        FxHelper.setPadding(FxHelper.getUIScaledInsets(12, 0, 0, 0),
                 mTabPane
         );
     }

@@ -43,6 +43,10 @@ public class Task implements EditableListItem {
     private String mDescription;
     @SerializedName("destDir")
     private File mDestDir;
+    @SerializedName("embeddedDir")
+    private File mEmbeddedDir;
+    @SerializedName("executeEmbedding")
+    private boolean mExecuteEmbedding;
     @SerializedName("executeResources")
     private boolean mExecuteResources;
     @SerializedName("executeScriptPost")
@@ -102,6 +106,10 @@ public class Task implements EditableListItem {
 
     public File getDestDir() {
         return mDestDir;
+    }
+
+    public File getEmbeddedDir() {
+        return mEmbeddedDir;
     }
 
     public String getId() {
@@ -169,6 +177,10 @@ public class Task implements EditableListItem {
         return mChecksumSha512;
     }
 
+    public boolean isExecuteEmbedding() {
+        return mExecuteEmbedding;
+    }
+
     public boolean isExecuteResources() {
         return mExecuteResources;
     }
@@ -230,6 +242,10 @@ public class Task implements EditableListItem {
 
         if (mResourceDir != null && !mResourceDir.isDirectory()) {
             addValidationError("invalid resource directory: " + mResourceDir);
+        }
+
+        if (mEmbeddedDir != null && !mEmbeddedDir.isDirectory()) {
+            addValidationError("invalid embedded directory: " + mEmbeddedDir);
         }
 
         if (mTemplateDirAppImage != null && !mTemplateDirAppImage.isDirectory()) {
@@ -307,6 +323,14 @@ public class Task implements EditableListItem {
 
     public void setDestDir(File destDir) {
         mDestDir = destDir;
+    }
+
+    public void setEmbeddedDir(File embeddedDir) {
+        mEmbeddedDir = embeddedDir;
+    }
+
+    public void setExecuteEmbedding(boolean executeEmbedding) {
+        mExecuteEmbedding = executeEmbedding;
     }
 
     public void setExecuteResources(boolean executeResources) {
@@ -400,6 +424,7 @@ public class Task implements EditableListItem {
         values.put("PRE execution", fileToString(mScriptPre));
         values.put("POST execution", fileToString(mScriptPost));
         values.put("Resources", fileToString(mResourceDir));
+        values.put("Embedding", fileToString(mEmbeddedDir));
         values.put("AppImage template", fileToString(mTemplateDirAppImage));
         values.put("Snap template", fileToString(mTemplateDirSnap));
         values.put(" ", "");

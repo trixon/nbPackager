@@ -258,6 +258,7 @@ public class Executor implements Runnable {
         }
 
         targetDir = new File(targetDir, mContentDir);
+
         if (mTask.isExecuteResources() && mTask.getResourceDir() != null && mTask.getResourceDir().isDirectory()) {
             mInputOutput.getOut().println("copy resources to: " + targetDir.getAbsolutePath());
             if (!mDryRun) {
@@ -265,6 +266,13 @@ public class Executor implements Runnable {
                 if (!"any".equals(target)) {
                     cp(new File(mTask.getResourceDir(), target), targetDir, true);
                 }
+            }
+        }
+
+        if (mTask.isExecuteEmbedding() && mTask.getEmbeddedDir() != null && mTask.getEmbeddedDir().isDirectory()) {
+            mInputOutput.getOut().println("embed application to: " + targetDir.getAbsolutePath());
+            if (!mDryRun) {
+                embed(mTask.getEmbeddedDir(), targetDir);
             }
         }
 
@@ -407,6 +415,16 @@ public class Executor implements Runnable {
                 executeScript(null, targetDir, postScriptFile);
             }
         }
+    }
+
+    private void embed(File embeddedDir, File targetDir) {
+        //TODO
+        /*
+        edit clusters, prepend embedded or app name
+        cp bin/*
+        cp etc/* (read, manipulate, write) cluster file
+        cp all dirs except bin, etc, platform, prepend prefix
+         */
     }
 
     private void execute(Map<String, String> environment, File workingDirectory, String... commands) {
