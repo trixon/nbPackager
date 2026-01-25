@@ -237,7 +237,8 @@ public class Task implements EditableListItem {
         if (!validSourceFile()) {
             addValidationError("no zip found in " + mSourceDir);
         }
-        if (!validEmbeddedFile()) {
+
+        if (isExecuteEmbedding() && !validEmbeddedFile()) {
             addValidationError("no embedded zip found in " + mEmbeddedDir);
         }
 
