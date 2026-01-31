@@ -15,7 +15,7 @@
  */
 package se.trixon.nbpackager.core;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.LinkedHashMap;
@@ -37,61 +37,61 @@ public class Task implements EditableListItem {
     private transient String mBasename;
     private File mEmbeddedFile;
     private transient String mEmbeddedName;
-    @SerializedName("checksum256")
+    @JsonProperty("checksum256")
     private boolean mChecksumSha256 = true;
-    @SerializedName("checksum512")
+    @JsonProperty("checksum512")
     private boolean mChecksumSha512 = true;
-    @SerializedName("description")
+    @JsonProperty("description")
     private String mDescription;
-    @SerializedName("destDir")
+    @JsonProperty("destDir")
     private File mDestDir;
-    @SerializedName("embeddedDir")
+    @JsonProperty("embeddedDir")
     private File mEmbeddedDir;
-    @SerializedName("executeEmbedding")
+    @JsonProperty("executeEmbedding")
     private boolean mExecuteEmbedding;
-    @SerializedName("executeResources")
+    @JsonProperty("executeResources")
     private boolean mExecuteResources;
-    @SerializedName("executeScriptPost")
+    @JsonProperty("executeScriptPost")
     private boolean mExecuteScriptPost;
-    @SerializedName("executeScriptPre")
+    @JsonProperty("executeScriptPre")
     private boolean mExecuteScriptPre;
-    @SerializedName("uuid")
+    @JsonProperty("uuid")
     private String mId = UUID.randomUUID().toString();
-    @SerializedName("jreLinux")
+    @JsonProperty("jreLinux")
     private File mJreLinux;
-    @SerializedName("jreMac")
+    @JsonProperty("jreMac")
     private File mJreMac;
-    @SerializedName("jreWindows")
+    @JsonProperty("jreWindows")
     private File mJreWindows;
-    @SerializedName("last_run")
+    @JsonProperty("last_run")
     private long mLastRun;
-    @SerializedName("name")
+    @JsonProperty("name")
     private String mName;
     private final transient Options mOptions = Options.getInstance();
-    @SerializedName("resourceDir")
+    @JsonProperty("resourceDir")
     private File mResourceDir;
-    @SerializedName("scriptPost")
+    @JsonProperty("scriptPost")
     private File mScriptPost;
-    @SerializedName("scriptPre")
+    @JsonProperty("scriptPre")
     private File mScriptPre;
-    @SerializedName("sourceDir")
+    @JsonProperty("sourceDir")
     private File mSourceDir;
     private transient File mSourceFile;
-    @SerializedName("targetAny")
+    @JsonProperty("targetAny")
     private boolean mTargetAny;
-    @SerializedName("targetLinux")
+    @JsonProperty("targetLinux")
     private boolean mTargetLinux;
-    @SerializedName("targetLinuxAppImage")
+    @JsonProperty("targetLinuxAppImage")
     private boolean mTargetLinuxAppImage;
-    @SerializedName("targetLinuxSnap")
+    @JsonProperty("targetLinuxSnap")
     private boolean mTargetLinuxSnap;
-    @SerializedName("targetMac")
+    @JsonProperty("targetMac")
     private boolean mTargetMac;
-    @SerializedName("targetWindows")
+    @JsonProperty("targetWindows")
     private boolean mTargetWindows;
-    @SerializedName("templateDirAppImage")
+    @JsonProperty("templateDirAppImage")
     private File mTemplateDirAppImage;
-    @SerializedName("templateDirSnap")
+    @JsonProperty("templateDirSnap")
     private File mTemplateDirSnap;
     private transient StringBuilder mValidationErrorBuilder;
 
