@@ -219,22 +219,22 @@ public class Executor implements Runnable {
         }
 
         var jreName = jreDir.getName();
-        var etcDir = new File(targetDir, "etc");
-        try (var stream = Files.newDirectoryStream(etcDir.toPath(), "*.{conf}"
-        )) {
-            for (var path : stream) {
-                var etcFile = path.toFile();
-                mInputOutput.getOut().println("set jdkhome in " + etcFile.getAbsolutePath());
-                if (!mDryRun) {
-                    if (updateJdkHome) {
+        if (updateJdkHome) {
+            var etcDir = new File(targetDir, "etc");
+            try (var stream = Files.newDirectoryStream(etcDir.toPath(), "*.{conf}"
+            )) {
+                for (var path : stream) {
+                    var etcFile = path.toFile();
+                    mInputOutput.getOut().println("set jdkhome in " + etcFile.getAbsolutePath());
+                    if (!mDryRun) {
                         var etcContent = FileUtils.readFileToString(etcFile, "utf-8");
                         var key = Strings.CS.contains(etcContent, "netbeans_jdkhome") ? "netbeans_jdkhome" : "jdkhome";
                         FileUtils.write(etcFile, String.format("\n\n# Added by Packager\n%s=\"%s\"\n", key, jreName), "utf-8", true);
                     }
                 }
+            } catch (IOException e) {
+                Exceptions.printStackTrace(e);
             }
-        } catch (IOException e) {
-            Exceptions.printStackTrace(e);
         }
 
         var destDir = new File(targetDir, jreName);
